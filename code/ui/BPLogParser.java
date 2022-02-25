@@ -1,5 +1,7 @@
 package com.socialvagrancy.blackpearl.logs.ui;
 
+import com.socialvagrancy.blackpearl.logs.ui.display.Display;
+
 public class BPLogParser
 {
 
@@ -10,6 +12,15 @@ public class BPLogParser
 			case "job-statistics":
 			case "job-stats":
 				Controller.jobStatistics(path);
+				break;
+			case "-h":
+			case "--help":
+				Display.fromFile("../lib/help/options.txt");
+				break;
+			case "-v":
+			case "--ver":
+			case "--version":
+				Display.fromFile("../lib/help/version.txt");
 				break;
 			default:
 				System.err.println("Invalid command selected. Please use --help or -h to see available commands.");

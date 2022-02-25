@@ -6,8 +6,6 @@
 
 package com.socialvagrancy.blackpearl.logs.ui;
 
-package java.nio.Files;
-
 public class ArgParser
 {
 	String command;
@@ -29,6 +27,31 @@ public class ArgParser
 		{
 			setCommand(args[0]);
 			setPath(args[1]);
+		}
+		else if(args.length > 0)
+		{
+			setOptions(args);
+		}
+	}
+
+	public void setOptions(String[] args)
+	{
+		setCommand(args[0]);
+
+		for(int i=1; i<args.length; i++)
+		{
+			switch(args[i])
+			{
+				case "-h":
+				case "--help":
+					setCommand("--help");
+					break;
+				case "-v":
+				case "--ver":
+				case "--version":
+					setCommand("--version");
+					break;
+			}
 		}
 	}
 
