@@ -6,6 +6,8 @@
 
 package com.socialvagrancy.blackpearl.logs.ui;
 
+import com.socialvagrancy.blackpearl.logs.ui.func.BuildPath;
+
 public class ArgParser
 {
 	String command;
@@ -23,21 +25,29 @@ public class ArgParser
 
 	public void parseArgs(String[] args)
 	{
+
 		if(args.length == 2)
 		{
 			setCommand(args[0]);
+
 			setPath(args[1]);
 		}
 		else if(args.length > 0)
 		{
 			setOptions(args);
 		}
+
 	}
 
 	public void setOptions(String[] args)
 	{
 		setCommand(args[0]);
 
+		// Don't parse the last passed arguement.
+		// args.length - 1.
+		// This allows PWD to be parsed separately.
+		// Until I find a better way to catch it in
+		// a switch.
 		for(int i=1; i<args.length; i++)
 		{
 			switch(args[i])
@@ -45,6 +55,14 @@ public class ArgParser
 				case "-h":
 				case "--help":
 					setCommand("--help");
+					break;
+				case "-p":
+				case "--path":
+					if(args.length > i+1)
+					{
+						setPath(args[i+1]);
+						i++;
+					}
 					break;
 				case "-v":
 				case "--ver":
@@ -76,47 +94,9 @@ public class ArgParser
 
 	private void setPath(String p)
 	{
-		//====================================================
-		// Process:
-		// 	The goal is to find the root path for the
-		// 	log folder. 
-		//	
-		//	Expected input styles:
-		//		- absoute: /path/to/logs
-		//		- relative: ../logs/ or ../logs/log/
-		//		- current: .
-		//
-		//	Absolute:
-		//	Relative:
-		//	Current:
-		//		Check directory structures to find
-		//		current. Looking for log, rest, manual.
-		//===================================================
-		String[] path = p.split("/");
-		String search = "manual";
-		int start = 0;
+		directory_path = p;
 		
-		// Iterate backwards through the path for the log root directory.
-		// then build the path out from there.
-		int itr = path.length-1;
-
-		while(itr > 0 && ( path[itr].length() < search.length() || !path[itr].substring(0, 6).equals(search)))
-		{
-			itr--;
-		}
-
-		// Check to see if the first character in the path is /. 
-		// If so, start at index 1 since path[0] will be a blank space.
-		if(p.substring(0, 1).equals("/"))
-		{
-			start = 1;
-		}
-
-		for(int i=start; i<=itr; i++)
-		{
-			System.out.println(path[i]);
-			directory_path = directory_path + "/" + path[i];
-		}
+		directory_path = BuildPath.fromArgs(directory_path);
 	}
 
 	private void setPathCurrent(String p)

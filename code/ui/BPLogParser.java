@@ -35,6 +35,6 @@ public class BPLogParser
 
 		//System.err.println(aparser.getPath());
 
-		BPLogParser.parseCommand(aparser.getCommand(), "../logs/");
+		BPLogParser.parseCommand(aparser.getCommand(), aparser.getPath());
 	}
 }

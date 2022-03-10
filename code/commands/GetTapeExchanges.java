@@ -40,13 +40,20 @@ public class GetTapeExchanges
 					if(parse_values.length>5)
 					{
 						parse_values[5] = parse_values[5].trim();
-						
+					
+						// Parse the line to see if section[5] contains TapePartition or TapeDrive
+						// all other data can be ignored.	
 						if(parse_values[5].equals("TapePartition") || parse_values[5].equals("TapeDrive"))
 						{
+							// Return an exchange that just contains the information included in the line.
 							exchange = parseLine(line);
 							
 							if(exchange != null)
 							{
+								// String the different lines together by attaching this exchange
+								// to the prior exchanges. If the last line of an individual exchange
+								// is passed, the 'completed' exchange is removed from the map and added
+								// to the exchange_list.
 								exchange = consolidateExchange(exchange, exchange_map);
 
 								if(exchange != null)
@@ -57,7 +64,7 @@ public class GetTapeExchanges
 						}
 					}		
 				}
-				
+			
 				return exchange_list;
 			}
 			catch(IOException e)
@@ -254,6 +261,8 @@ public class GetTapeExchanges
 
 	public static void print(ArrayList<TapeExchange> exchange_list)
 	{
+		System.out.println("Exchange List Size: " + exchange_list.size());
+
 		for(int i=0; i<exchange_list.size(); i++)
 		{
 			System.out.println("Move (" + i + "): Tape (" + exchange_list.get(i).tape_barcode + ") to drive (" + 

@@ -6,6 +6,7 @@ import com.socialvagrancy.blackpearl.logs.structures.TapeActivity;
 import com.socialvagrancy.blackpearl.logs.structures.TapeExchange;
 import com.socialvagrancy.blackpearl.logs.structures.TapeJob;
 import com.socialvagrancy.blackpearl.logs.structures.Task;
+import com.socialvagrancy.blackpearl.logs.utils.BPLogDateConverter;
 import com.socialvagrancy.utils.storage.UnitConverter;
 
 import java.math.BigInteger;
@@ -30,7 +31,6 @@ public class CalcJobStatistics
 		// 	the job starts processing (data_time = tape_data_start).
 		//=================================================================
 
-		DateTimeFormatter string_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss", Locale.ENGLISH);
 		String tape_drive;
 		String created_at;
 		String date_completed;
@@ -38,25 +38,50 @@ public class CalcJobStatistics
 		LocalDateTime data_time;
 		LocalDateTime mount_time;
 		LocalDateTime eject_time;
+		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 		TapeExchange exchange;
 
 		for(int i=0; i < stat_list.size(); i++)
 		{
 			// Create datetime variables for the important time marks.
 			// 	This allows search the treemap for closest timestamp.
-			start_time = LocalDateTime.parse(LocalDateTime.now().getYear() + " " + stat_list.get(i).created_at, string_format);
-			data_time = LocalDateTime.parse(LocalDateTime.now().getYear() + " " + stat_list.get(i).tape_data_start, string_format);
+			// 	Using LocalDateTime as the date is already formatted.
+			start_time = LocalDateTime.parse(stat_list.get(i).created_at, final_format);
+			data_time = LocalDateTime.parse(stat_list.get(i).tape_data_start, final_format);
+
+			// Subtract 1 second from start_time as it is possible a move will be queue the same second
+			// a job is created. This corrects an issue where tape exchanges queued immediate after the 
+			// job is created are being missed with the TreeMap.afterKey(time) search.
+			start_time = start_time.minusSeconds(1);
 
 			// Find the tape mount that started before data started being written to the drive.
 			// As data can't be written to an empty drive, the assumption is this move has to be
 			// a tape mount.
+			//
+			// It's possible a mount_time doesn't exist in the logs. If null set date to Jan 1 2000.
+			// This will cause it to fail the test and have the drive marked as already loaded.
 			mount_time = exchange_map.get(stat_list.get(i).tape_drive_sn).lowerKey(data_time);
-			
-			// Ejection should be the move before the exchange identified above. Tapes can't be
-			// moved to a drive that is already occupied, so this has to be the eject call. 
-			eject_time = exchange_map.get(stat_list.get(i).tape_drive_sn).lowerKey(mount_time);
+		
+			if(mount_time == null)
+			{
+				
 
-			exchange = exchange_map.get(stat_list.get(i).tape_drive_sn).get(mount_time);
+				// An exchange is needed to fill out drive and tape info.
+				mount_time = exchange_map.get(stat_list.get(i).tape_drive_sn).higherKey(data_time);
+				exchange = exchange_map.get(stat_list.get(i).tape_drive_sn).get(mount_time);
+				
+				// Set mount time to a pre-blackpearl era
+				mount_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
+				eject_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
+			}
+			else
+			{
+				// Ejection should be the move before the exchange identified above. Tapes can't be
+				// moved to a drive that is already occupied, so this has to be the eject call. 
+				eject_time = exchange_map.get(stat_list.get(i).tape_drive_sn).lowerKey(mount_time);
+	
+				exchange = exchange_map.get(stat_list.get(i).tape_drive_sn).get(mount_time);
+			}
 
 			// Identify the drive number.
 			// 	This is grabbed off of the slot. Drive count starts at slot 256 
@@ -80,17 +105,17 @@ public class CalcJobStatistics
 				// if the move occurred after the start_time, it was the result of the job.
 				
 				stat_list.get(i).wasMounted = false;
-				stat_list.get(i).mount_start = exchange.start_time;
-				stat_list.get(i).mount_end = exchange.end_time;
-				stat_list.get(i).mount_duration = findDuration(exchange.start_time, exchange.end_time);
+				stat_list.get(i).mount_start = BPLogDateConverter.formatTapeBackendTimestamp(exchange.start_time).format(final_format);
+				stat_list.get(i).mount_end = BPLogDateConverter.formatTapeBackendTimestamp(exchange.end_time).format(final_format);
+				stat_list.get(i).mount_duration = BPLogDateConverter.calcDuration(stat_list.get(i).mount_start, stat_list.get(i).mount_end);
 				
 				// SWITCH EXCHANGE TO EJECT CALL
 				exchange = exchange_map.get(stat_list.get(i).tape_drive_sn).get(eject_time);
 
-				stat_list.get(i).eject_call = exchange.prepare_time;
-				stat_list.get(i).eject_start = exchange.start_time;
-				stat_list.get(i).eject_end = exchange.end_time;
-				stat_list.get(i).eject_duration = findDuration(exchange.start_time, exchange.end_time);
+				stat_list.get(i).eject_call = BPLogDateConverter.formatTapeBackendTimestamp(exchange.prepare_time).format(final_format);
+				stat_list.get(i).eject_start = BPLogDateConverter.formatTapeBackendTimestamp(exchange.start_time).format(final_format);
+				stat_list.get(i).eject_end = BPLogDateConverter.formatTapeBackendTimestamp(exchange.end_time).format(final_format);
+				stat_list.get(i).eject_duration = BPLogDateConverter.calcDuration(stat_list.get(i).eject_start, stat_list.get(i).eject_end);
 			}
 			else
 			{
@@ -113,8 +138,6 @@ public class CalcJobStatistics
 
 	public static ArrayList<JobStatistics> attachTapeJobs(ArrayList<JobStatistics> stat_list, HashMap<String, TreeMap<LocalDateTime, TapeJob>> job_map) 
 	{
-		DateTimeFormatter string_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss", Locale.ENGLISH);
-
 		String tape_drive;
 		String created_at;
 		String date_completed;
@@ -123,31 +146,31 @@ public class CalcJobStatistics
 		LocalDateTime job_time;
 		LocalDateTime job_end;
 		LocalDateTime test_time;
+		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 		TapeJob job;
 
 		for(int i=0; i < stat_list.size(); i++)
 		{
-			start_time = LocalDateTime.parse(LocalDateTime.now().getYear() + " " + stat_list.get(i).created_at, string_format);
-			end_time = LocalDateTime.parse(LocalDateTime.now().getYear() + " " + stat_list.get(i).date_completed, string_format);
+			start_time = LocalDateTime.parse(stat_list.get(i).created_at, final_format);
+			end_time = LocalDateTime.parse(stat_list.get(i).date_completed, final_format);
 	
 			
 			test_time = end_time;
-			int year = LocalDateTime.now().getYear();
-
+			
 			do
 			{
 				job_time = job_map.get(stat_list.get(i).tape_drive_sn).lowerKey(test_time);
 
 				job = job_map.get(stat_list.get(i).tape_drive_sn).get(job_time);
 				
-				job_end = LocalDateTime.parse(year + " " + job.end_time, string_format);
+				job_end = BPLogDateConverter.formatTapeBackendTimestamp(job.end_time);
 
 				test_time = job_time; // Set this in case we hit the while.
 			
 			} while(job_end.isAfter(end_time));
 
-			stat_list.get(i).tape_data_start = job.start_time;
-			stat_list.get(i).tape_data_end = job.end_time;
+			stat_list.get(i).tape_data_start = BPLogDateConverter.formatTapeBackendTimestamp(job.start_time).format(final_format);
+			stat_list.get(i).tape_data_end = BPLogDateConverter.formatTapeBackendTimestamp(job.end_time).format(final_format);
 			stat_list.get(i).tape_data_duration = job.duration;
 		}
 
@@ -156,33 +179,36 @@ public class CalcJobStatistics
 
 	public static ArrayList<JobStatistics> calculate(String log_path)
 	{
-		CompletedJob jobs = GetCompletedJobs.fromJson(log_path + "gui_ds3_completed_jobs.json");
-		ArrayList<Task> task_list = GetTapeTasks.fromDataPlannerMain(log_path + "var.log.dataplanner-main.log");		
-		HashMap<String, ArrayList<String>> job_id_chunk_map = GetJobIDandChunks.fromDataplannerMain(log_path + "var.log.dataplanner-main.log");
-		ArrayList<TapeExchange> exchange_list = GetTapeExchanges.fromTapeBackend(log_path + "var.log.tape_backend.log");
-		ArrayList<TapeJob> job_list = GetTapeJobs.fromTapeBackend(log_path + "var.log.tape_backend.log");
+		CompletedJob jobs = GetCompletedJobs.fromJson(log_path + "rest/gui_ds3_completed_jobs.json");
+		ArrayList<Task> task_list = GetTapeTasks.fromDataPlannerMain(log_path + "logs/var.log.dataplanner-main.log");		
+		HashMap<String, ArrayList<String>> job_id_chunk_map = GetJobIDandChunks.fromDataplannerMain(log_path + "logs/var.log.dataplanner-main.log");
+		ArrayList<TapeExchange> exchange_list = GetTapeExchanges.fromTapeBackend(log_path + "logs/var.log.tape_backend.log");
+		ArrayList<TapeJob> job_list = GetTapeJobs.fromTapeBackend(log_path + "logs/var.log.tape_backend.log");
 
 		if(task_list.size() > 0 && jobs.data.length > 0)
 		{	
+
 			HashMap<String, Task> task_map = mapTasksToChunks(task_list);
 
 			ArrayList<JobStatistics> stat_list = initializeStatList(jobs, task_map, job_id_chunk_map);
-		
+
 			HashMap<String, TreeMap<LocalDateTime, TapeExchange>> exchange_map = mapActivity(exchange_list);
 			HashMap<String, TreeMap<LocalDateTime, TapeJob>> job_map = mapActivity(job_list);
 
 			stat_list = attachTapeJobs(stat_list, job_map);
 			stat_list = attachTapeExchanges(stat_list, exchange_map);
-	
-			print(stat_list);
 
 			return stat_list;
 		}
-			
+		
+
 		return null;
 	}
 
-	public static String findDuration(String start_date, String end_date)
+/*	MARK FOR DELETION
+ *	REPLACED BY BPLogDateConverter.calcDuration(t1, t2);
+ *
+ * 	public static String findDuration(String start_date, String end_date)
 	{
 		int year = LocalDateTime.now().getYear();
 
@@ -199,7 +225,10 @@ public class CalcJobStatistics
 
 		return hours + ":" + minutes + ":" + seconds;
 	}
-
+*/
+/* 	MARKED FOR DELETION
+ *  	DOES NOT APPEAR TO BE USED IN CODE.
+ *
 	public static String findWriteSpeed(BigInteger size_in_bytes, String dur)
 	{
 		String[] time_comp = dur.split(":");
@@ -209,11 +238,10 @@ public class CalcJobStatistics
 		return UnitConverter.bytesToHumanReadable(speed) + "/s";
 
 	}
+*/
 
 	public static ArrayList<JobStatistics> initializeStatList(CompletedJob jobs, HashMap<String, Task> task_map, HashMap<String, ArrayList<String>> job_id_chunk_map)
 	{
-		DateTimeFormatter json_format = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss.SSS", Locale.ENGLISH);
-		DateTimeFormatter string_format = DateTimeFormatter.ofPattern("MMM dd HH:mm:ss", Locale.ENGLISH);
 		String created_at;
 		String date_completed;
 		
@@ -240,16 +268,14 @@ public class CalcJobStatistics
 						stat = new JobStatistics();
 
 						// Format JSON data values to something the computer actually recognizes as a timestamp.
-						created_at = jobs.data[i].created_at.replace('T', '_'); // Remove the T separating date and time.
-						created_at = created_at.substring(0, created_at.length()-1); // Remove the trailing Z
-						date_completed = jobs.data[i].date_completed.replace('T', '_'); // Remove the T separating date and time.
-						date_completed = date_completed.substring(0, date_completed.length()-1); // Remove the trailing Z.
+						created_at = BPLogDateConverter.formatCompletedJobsTimestamp(jobs.data[i].created_at);
+						date_completed = BPLogDateConverter.formatCompletedJobsTimestamp(jobs.data[i].date_completed);
 
 						stat.job_id = jobs.data[i].id;
 						stat.job_name = jobs.data[i].name;
-						stat.created_at = LocalDateTime.parse(created_at, json_format).format(string_format);
-						stat.date_completed = LocalDateTime.parse(date_completed, json_format).format(string_format);
-						stat.job_duration = findDuration(LocalDateTime.parse(created_at, json_format).format(string_format), LocalDateTime.parse(date_completed, json_format).format(string_format));
+						stat.created_at = created_at;
+						stat.date_completed = date_completed;
+						stat.job_duration = BPLogDateConverter.calcDuration(created_at, date_completed);
 						stat.request_type = jobs.data[i].request_type;
 						stat.size_in_bytes = new BigInteger(jobs.data[i].original_size_in_bytes);
 						stat.human_readable_size = UnitConverter.bytesToHumanReadable(stat.size_in_bytes);
@@ -277,7 +303,6 @@ public class CalcJobStatistics
 		TreeMap<LocalDateTime, T> log_tree = null;
 		LocalDateTime timestamp;
 		String compare_drive = "empty"; // value to be compared to split the array down into individual tree maps.
-		int year = LocalDateTime.now().getYear();
 		String date;
 
 		// Order the array list by tape drive.
@@ -285,6 +310,7 @@ public class CalcJobStatistics
 
 		for(int i=0; i < action_list.size(); i++)
 		{
+
 			// Add log_tree to hashmap and create new log_tree
 			if(!action_list.get(i).drive_sn.equals(compare_drive))
 			{
@@ -302,20 +328,9 @@ public class CalcJobStatistics
 				// Convert the start_time into a time_stamp for searching in the tree.
 				// As the logs don't include a year field, the current year is grabbed
 				// from the file.
-				date = year + " " + action_list.get(i).start_time;
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss", Locale.ENGLISH);
-				timestamp = LocalDateTime.parse(date, formatter);
 
-				//********************************************************
-				// ISSUE
-				// 	Does not handle logs that span a year.
-				// 	Maybe put a check between this date and the 
-				// 	last date to see if we're more than a month forware
-				// 	and subtract 1 from year if so?
-				//********************************************************
-				// END ISSUE
-				//********************************************************
-			
+				timestamp = BPLogDateConverter.formatTapeBackendTimestamp(action_list.get(i).start_time);
+
 				log_tree.put(timestamp, action_list.get(i));
 			}
 		}
