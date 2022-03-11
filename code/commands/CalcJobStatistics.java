@@ -38,7 +38,7 @@ public class CalcJobStatistics
 		LocalDateTime data_time;
 		LocalDateTime mount_time;
 		LocalDateTime eject_time;
-		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		TapeExchange exchange;
 
 		for(int i=0; i < stat_list.size(); i++)
@@ -71,8 +71,8 @@ public class CalcJobStatistics
 				exchange = exchange_map.get(stat_list.get(i).tape_drive_sn).get(mount_time);
 				
 				// Set mount time to a pre-blackpearl era
-				mount_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
-				eject_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
+				mount_time = LocalDateTime.parse("2000-01-01 00:00:01", final_format);
+				eject_time = LocalDateTime.parse("2000-01-01 00:00:01", final_format);
 			}
 			else
 			{
@@ -146,7 +146,7 @@ public class CalcJobStatistics
 		LocalDateTime job_time;
 		LocalDateTime job_end;
 		LocalDateTime test_time;
-		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		TapeJob job;
 
 		for(int i=0; i < stat_list.size(); i++)

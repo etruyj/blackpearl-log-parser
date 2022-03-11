@@ -20,7 +20,7 @@ public class BPLogDateConverter
 {
 	public static String calcDuration(String t1, String t2)
 	{
-		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime start = LocalDateTime.parse(t1, format);
 		LocalDateTime end = LocalDateTime.parse(t2, format);
 
@@ -43,7 +43,7 @@ public class BPLogDateConverter
 
 		LocalDateTime stamp = LocalDateTime.parse(cleaned_time[0], in_format);
 
-		return stamp.format(out_format);
+		return stamp.format(in_format);
 	}
 
 	public static LocalDateTime formatDataPlannerTimestamp(String timestamp)
