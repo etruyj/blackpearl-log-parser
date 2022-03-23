@@ -13,8 +13,8 @@
 package com.socialvagrancy.blackpearl.logs.utils;
 
 import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class BPLogDateConverter
 {
@@ -31,6 +31,29 @@ public class BPLogDateConverter
 		long hours = duration.toHours();
 
 		return hours + ":" + minutes + ":" + seconds;
+	}
+
+	public static float calcPercentDuration(String dur_total, String dur_partial)
+	{
+		// input duration format will always be in hh:mm:ss format.
+		// this format needs to be converted to PThhHmmMssS format for
+		// the duration class.
+		// 
+		// Total First
+		String[] temp_dur = dur_total.split(":");
+		dur_total = "PT" + temp_dur[0] + "H" + temp_dur[1] + "M" + temp_dur[2] + "S";
+		// And partial second
+		temp_dur = dur_partial.split(":");
+		dur_partial = "PT" + temp_dur[0] + "H" + temp_dur[1] + "M" + temp_dur[2] + "S";
+		
+		Duration total = Duration.parse(dur_total);
+		Duration partial = Duration.parse(dur_partial);
+		float percent = (float)partial.toSeconds()/(float)total.toSeconds();
+	
+		// Convert to human readable
+		percent = percent * 100;
+
+		return percent;
 	}
 
 	public static String formatCompletedJobsTimestamp(String timestamp)

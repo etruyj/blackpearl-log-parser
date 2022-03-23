@@ -16,6 +16,127 @@ import java.util.HashMap;
 
 public class GetTapeTasks
 {
+	public static ArrayList<Task> fromAllLogs(String path)
+	{
+		String file_path;
+		ArrayList<Task> task_list = new ArrayList<Task>();
+		
+		for(int i=10; i>=0; i--)
+		{
+			if(i>0)
+			{
+				file_path = path + "." + i;
+			}
+			else
+			{
+				file_path = path;
+			}
+
+			
+			File file = new File(file_path);
+
+			if(file.exists())
+			{
+	
+				HashMap<String, Task> wtask_map = new HashMap<String, Task>();
+				HashMap<String, Task> rtask_map = new HashMap<String, Task>();
+
+				Task task;
+
+				String write_task = "WriteChunkToTapeTask#";
+				String read_task = "ReadChunkFromTapeTask#";
+
+				try
+				{
+					BufferedReader br = new BufferedReader(new FileReader(file));
+
+					String line = null;
+					String[] parse_value;
+					String[] log_line;
+					String field;				
+
+					while((line = br.readLine()) != null)
+					{
+						parse_value = line.split(" ");
+					
+						// To minimize processing time, we're processing input as it's read
+						// from the file. This way the whole log doesn't need to be stored
+						// in a variable.
+
+						if(parse_value.length > 4 && 
+							parse_value[4].length() > (write_task.length() + 1) && 
+							(parse_value[4].substring(1, write_task.length()+1).equals(write_task) ||
+							parse_value[4].substring(1, read_task.length()+1).equals(read_task)))
+						{
+							if(parse_value[4].substring(1, write_task.length()+1).equals(write_task))
+							{
+								field = parse_value[4].substring(write_task.length()+1, parse_value[4].length()-1);
+				
+								// If the task doesn't exist in the map, create a new task and put 
+								// it in the map
+								if(wtask_map.get(field)==null)
+								{
+									task = new Task();
+									task.id = field;
+									task.type = "PUT";
+									task.created_at = parse_value[1] + " " + parse_value[2] + " " + parse_value[3];
+									wtask_map.put(field, task);
+									
+								}
+								
+								// Pass the task entry from the map into the parse function to fill in the needed fields.
+								// The completed task is returned to the entry on the task map.
+								wtask_map.put(field, parseLineWrite(line, wtask_map.get(field), (write_task+field)));							
+							}
+							else if(parse_value[4].length() > read_task.length() && parse_value[4].substring(1, read_task.length()+1).equals(read_task))
+	
+							{
+								field = parse_value[4].substring(read_task.length()+1, parse_value[4].length()-1);
+					
+								// If the task doesn't exist in the map, create a new task and put 
+								// it in the map
+								if(rtask_map.get(field)==null)
+								{
+									task = new Task();
+									task.id = field;
+									task.type = "GET";
+									task.created_at = parse_value[1] + " " + parse_value[2] + " " + parse_value[3];
+									rtask_map.put(field, task);
+								}
+							
+								// Pass the task entry from the map into the parse function to fill in the needed fields.
+								// The completed task is returned to the entry on the task map.
+								rtask_map.put(field, parseLineRead(line, rtask_map.get(field), (read_task+field)));							
+	
+							}
+						}
+					}
+		
+					br.close();
+
+					// End of parsing. Convert maps to an ArrayList for display
+					// or return to calling function.	
+					task_list.addAll(buildTaskList(wtask_map));
+					task_list.addAll(buildTaskList(rtask_map));
+				}
+				catch(IOException e)
+				{
+					System.err.println(e.getMessage());
+	
+					return null;
+				}
+
+			}
+			else
+			{
+				System.err.println("WARNING: file " + file_path + " does not exist.");
+			}
+			
+		}
+			
+		return task_list;
+	}
+
 	public static ArrayList<Task> fromDataPlannerMain(String path)
 	{
 		File file = new File(path);
@@ -97,7 +218,9 @@ public class GetTapeTasks
 						}
 					}
 				}
-		
+	
+				br.close();
+
 				// End of parsing. Convert maps to an ArrayList for display
 				// or return to calling function.	
 				task_list.addAll(buildTaskList(wtask_map));

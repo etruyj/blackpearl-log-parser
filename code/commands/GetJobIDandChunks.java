@@ -14,6 +14,86 @@ import java.util.HashMap;
 
 public class GetJobIDandChunks
 {
+	public static HashMap<String, ArrayList<String>> fromAllLogs(String path)
+	{
+		HashMap<String, ArrayList<String>> id_map = new HashMap<String, ArrayList<String>>();
+		String file_path;
+
+		for(int i=10; i>=0; i--)
+		{
+			if(i>0)
+			{
+				file_path = path + "." + i;
+			}
+			else
+			{
+				file_path = path;
+			}
+
+			File file = new File(file_path);
+			String match = "SQLTrans";
+
+			ArrayList<String> chunks;
+
+			if(file.exists())
+			{
+				try
+				{
+					BufferedReader br = new BufferedReader(new FileReader(file));
+	
+					String line = null;
+					String[] parse_value;
+					String[] id_pair;
+
+					int itr = 0;
+					while((line = br.readLine()) != null)
+					{
+						parse_value = line.split("\\|");
+					
+						if(parse_value.length > 1 && 
+							parse_value[1].length() > match.length() && 
+							parse_value[1].substring(1, match.length()+1).equals(match))
+						{
+							id_pair = parseLine(parse_value[1]);
+						
+							if(id_pair[0] != null)
+							{
+								if(id_map.get(id_pair[0])==null)
+								{
+									chunks = new ArrayList<String>();
+									chunks.add(id_pair[1]);
+
+									id_map.put(id_pair[0], chunks);
+								}
+								else
+								{
+									chunks = id_map.get(id_pair[0]);
+									chunks.add(id_pair[1]);
+	
+									id_map.put(id_pair[0], chunks);
+								}
+							}
+						}
+					}
+		
+					br.close();
+
+				}
+				catch(IOException e)
+				{
+					System.err.println(e.getMessage());
+					return null;
+				}
+			}
+			else
+			{
+				System.err.println("WARNING: file " + file_path + " does not exist.");
+			}
+		}
+		
+		return id_map;
+	}
+
 	public static HashMap<String, ArrayList<String>> fromDataplannerMain(String path)
 	{
 		File file = new File(path);
@@ -63,6 +143,8 @@ public class GetJobIDandChunks
 					}
 				}
 			
+				br.close();
+
 				return id_map;
 			}
 			catch(IOException e)

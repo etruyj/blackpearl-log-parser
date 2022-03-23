@@ -112,7 +112,6 @@ public class CalcJobStatistics
 				// SWITCH EXCHANGE TO EJECT CALL
 				exchange = exchange_map.get(stat_list.get(i).tape_drive_sn).get(eject_time);
 
-				stat_list.get(i).eject_call = BPLogDateConverter.formatTapeBackendTimestamp(exchange.prepare_time).format(final_format);
 				stat_list.get(i).eject_start = BPLogDateConverter.formatTapeBackendTimestamp(exchange.start_time).format(final_format);
 				stat_list.get(i).eject_end = BPLogDateConverter.formatTapeBackendTimestamp(exchange.end_time).format(final_format);
 				stat_list.get(i).eject_duration = BPLogDateConverter.calcDuration(stat_list.get(i).eject_start, stat_list.get(i).eject_end);
@@ -181,6 +180,8 @@ public class CalcJobStatistics
 	{
 		CompletedJob jobs = GetCompletedJobs.fromJson(log_path + "rest/gui_ds3_completed_jobs.json");
 		ArrayList<Task> task_list = GetTapeTasks.fromDataPlannerMain(log_path + "logs/var.log.dataplanner-main.log");		
+		//task_list = GetTapeTasks.fromAllLogs(log_path + "logs/var.log.dataplanner-main.log");		
+		//HashMap<String, ArrayList<String>> job_id_chunk_map = GetJobIDandChunks.fromAllLogs(log_path + "logs/var.log.dataplanner-main.log");
 		HashMap<String, ArrayList<String>> job_id_chunk_map = GetJobIDandChunks.fromDataplannerMain(log_path + "logs/var.log.dataplanner-main.log");
 		ArrayList<TapeExchange> exchange_list = GetTapeExchanges.fromTapeBackend(log_path + "logs/var.log.tape_backend.log");
 		ArrayList<TapeJob> job_list = GetTapeJobs.fromTapeBackend(log_path + "logs/var.log.tape_backend.log");
@@ -197,6 +198,8 @@ public class CalcJobStatistics
 
 			stat_list = attachTapeJobs(stat_list, job_map);
 			stat_list = attachTapeExchanges(stat_list, exchange_map);
+
+			stat_list = calculateDelays(stat_list);
 
 			return stat_list;
 		}
@@ -359,6 +362,36 @@ public class CalcJobStatistics
 		return task_map;
 	}
 
+	public static ArrayList<JobStatistics> calculateDelays(ArrayList<JobStatistics> stat_list)
+	{
+		// Calculates the delays between metrics for presentation in the statistics report
+		// includes the percent of time those delays took out of the total job.
+
+		for(int i=0; i<stat_list.size(); i++)
+		{
+			// Delay from job creation to mount tape command sent
+			// Length of time it took to start mounting the tape.
+			if(!stat_list.get(i).wasMounted)
+			{
+				stat_list.get(i).create_to_mount_time = BPLogDateConverter.calcDuration(stat_list.get(i).created_at, stat_list.get(i).mount_start);
+				stat_list.get(i).create_to_mount_percent = String.valueOf((int)BPLogDateConverter.calcPercentDuration(stat_list.get(i).job_duration, stat_list.get(i).create_to_mount_time)) + "%";
+			}
+			else
+			{
+				stat_list.get(i).create_to_mount_time = "00:00:00";
+				stat_list.get(i).create_to_mount_percent = "0%";
+			}
+
+			// Delay from read/write finished to job finished.
+			// More useful for GETs.
+			// Length of time it took to read data back from cache.
+			stat_list.get(i).data_end_to_complete_time = BPLogDateConverter.calcDuration(stat_list.get(i).tape_data_end, stat_list.get(i).date_completed);
+			stat_list.get(i).data_end_to_complete_percent = String.valueOf((int)BPLogDateConverter.calcPercentDuration(stat_list.get(i).job_duration, stat_list.get(i).data_end_to_complete_time)) + "%";
+		}
+
+		return stat_list;
+	}
+
 	public static void main(String[] args)
 	{
 		CalcJobStatistics stats = new CalcJobStatistics();
@@ -368,7 +401,7 @@ public class CalcJobStatistics
 
 	public static void print(ArrayList<JobStatistics> stat_list)
 	{
-		System.out.println("job_id,job_name,request_type,size,created_at,date_completed,job_duration,chunk_id,drive_num,drive_sn,bar_code,already_mounted,eject_call,eject_start,eject_finish,eject_duration,mount_start,mount_finish,mount_duration,write_start,write_finish,write_duration,write_speed");
+		System.out.println("job_id,job_name,request_type,size,created_at,date_completed,job_duration,chunk_id,drive_num,drive_sn,bar_code,already_mounted,eject_start,eject_finish,eject_duration,mount_start,mount_finish,mount_duration,write_start,write_finish,write_duration,write_speed,mount_delay,mount_delay_%,complete_delay,complete_delay_%");
 		
 		for(int i=0; i<stat_list.size(); i++)
 		{
@@ -393,7 +426,6 @@ public class CalcJobStatistics
 				System.out.print("FALSE,");
 			}
 
-			System.out.print(stat_list.get(i).eject_call + ",");
 			System.out.print(stat_list.get(i).eject_start + ",");
 			System.out.print(stat_list.get(i).eject_end + ",");
 			System.out.print(stat_list.get(i).eject_duration + ",");
@@ -403,7 +435,11 @@ public class CalcJobStatistics
 			System.out.print(stat_list.get(i).tape_data_start + ",");
 			System.out.print(stat_list.get(i).tape_data_end + ",");
 			System.out.print(stat_list.get(i).tape_data_duration + ",");
-			System.out.print(stat_list.get(i).tape_write_speed);
+			System.out.print(stat_list.get(i).tape_write_speed + ",");
+			System.out.print(stat_list.get(i).create_to_mount_time + ",");
+			System.out.print(stat_list.get(i).create_to_mount_percent + ",");
+			System.out.print(stat_list.get(i).data_end_to_complete_time + ",");
+			System.out.print(stat_list.get(i).data_end_to_complete_percent);
 			System.out.print("\n");
 		}
 	}

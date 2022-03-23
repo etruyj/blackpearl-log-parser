@@ -8,15 +8,95 @@ package com.socialvagrancy.blackpearl.logs.commands;
 
 import com.socialvagrancy.blackpearl.logs.structures.TapeJob;
 
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GetTapeJobs
 {
+	public static ArrayList<TapeJob> fromAllLogs(String path)
+	{
+		String file_path;
+
+		for(int i=10; i>=-1; i++)
+		{
+			if(i>-1)
+			{
+				file_path = path + "." + i + ".bz2";
+			}
+			else
+			{
+				file_path = path;
+			}
+		
+			File file = new File(file_path);
+
+			if(file.exists())
+			{
+				HashMap<String, TapeJob> job_map = new HashMap<String, TapeJob>();
+				ArrayList<TapeJob> job_list = new ArrayList<TapeJob>();
+				TapeJob job;
+
+				try
+				{
+					if(i>-1)
+					{
+						// Log is compressed and has to use a different buffered reader initialization.
+						BufferedReader br = new BufferedReader(new InputStreamReader(new BZip2CompressorInputStream(file)));
+					}
+					else
+					{
+						BufferedReader br = new BufferedReader(new FileReader(file));
+					}
+
+					String line = null;
+					String[] parse_values;
+
+					while((line = br.readLine()) != null)
+					{
+						parse_values = line.split(":");
+					
+						if(parse_values.length > 5 && parse_values[5].trim().equals("TapeDrive"))
+						{
+							job = parseLine(line);
+
+							if(job != null)
+							{
+								job = consolidateJob(job, job_map);
+
+								if(job != null)
+								{
+									job_list.add(job);
+								}
+							}
+						}
+					}
+				}
+				catch(IOException e)
+				{
+					System.err.println(e.getMessage());
+
+					return null;
+				}
+		
+			}
+			else
+			{
+				System.err.println("WARNING: file " + file_path + " does not exist");
+
+			}
+		}
+		
+		return job_list;
+
+	}
+
 	public static ArrayList<TapeJob> fromTapeBackend(String path)
 	{
 		File file = new File(path);
