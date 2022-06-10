@@ -43,17 +43,32 @@ public class TapeTaskParser implements ParserInterface
 				task_id = parseTaskID(line, read_task);
 			
 				task = getTask(task_id);	
-				
+			
+				task.id = task_id;	
 				task.type = "GET";
 				task = parseRead(line, task);
-			
-				updateTask(task_id, task);
+				
+				// Don't update if no new info.
+				if(!task.type.equals("skip"))
+				{
+					updateTask(task_id, task);
+				}
 			}
 			else if(line.contains(write_task))
 			{
 				task_id = parseTaskID(line, write_task);
-			
-				System.out.println(line);
+		
+				task = getTask(task_id);
+				
+				task.id = task_id;	
+				task.type = "PUT";
+				task = parseWrite(line, task);
+				
+				// Don't update if no new info.
+				if(!task.type.equals("skip"))
+				{
+					updateTask(task_id, task);
+				}
 			}
 
 		}
@@ -63,7 +78,7 @@ public class TapeTaskParser implements ParserInterface
 	public Task parseRead(String line, Task task)
 	{
 		String completion_search = "Task has finished executing";
-		String chunk_search = "SQL: UPDATE ds3.job_chunk";
+		String chunk_search = "SQL: UPDATE ds3.job_chunk ";
 		String creation_search = "Locked Tape Drive";
 		String drive_search = "RPC TapeDrive$";
 		String throughput_search = "from tape at ";
@@ -88,6 +103,11 @@ public class TapeTaskParser implements ParserInterface
 		{
 			task.created_at = searchTimeStamp(line);
 		}
+		else
+		{
+			// No updates to task.
+			task.type = "skip";
+		}
 
 		return task;
 	}
@@ -104,6 +124,49 @@ public class TapeTaskParser implements ParserInterface
 		task_id = line_parts[0];
 
 		return task_id;
+	}
+
+	public Task parseWrite(String line, Task task)
+	{
+		String completion_search = "Task has finished executing";
+		String chunk_search = "SQL: UPDATE ds3.job_chunk ";
+		String chunk_search_2 = "chunks in one task: ";
+		String creation_search = "Locked Tape Drive";
+		String drive_search = "RPC TapeDrive$";
+		String throughput_search = "quiesced to tape";
+		
+		if(line.contains(creation_search))
+		{
+			task.created_at = searchTimeStamp(line);
+		}
+		else if(line.contains(chunk_search) && task.chunk_id == null)
+		{
+			task.chunk_id = searchChunkID(line, task.chunk_id);
+		}
+		else if(line.contains(chunk_search_2) && task.chunk_id == null)
+		{
+			task.chunk_id = searchServicingChunks(line);
+		}
+		else if(line.contains(drive_search))
+		{
+			task.drive_wwn = searchDriveWWN(line, line.indexOf(drive_search) + drive_search.length());
+		}
+		else if(line.contains(completion_search))
+		{
+			task.date_completed = searchTimeStamp(line);
+		}
+		else if(line.contains(throughput_search))
+		{
+			String sub_search = "effectively ";
+			task.throughput = searchThroughput(line, line.indexOf(sub_search) + sub_search.length());
+		}
+		else
+		{
+			// No updates to task
+			task.type = "skip";
+		}
+		
+		return task;
 	}
 
 	private String[] searchChunkID(String line, String[] chunks)
@@ -143,6 +206,16 @@ public class TapeTaskParser implements ParserInterface
 		id_set[chunk_index] = chunk_id;
 
 		return id_set;
+	}
+
+	private String[] searchServicingChunks(String line)
+	{
+		String start = "task: ";
+		String end = ".";
+		String chunk_list = line.substring(line.indexOf(start) + start.length() + 2, line.indexOf(end) + end.length() - 3);
+		String[] chunks = chunk_list.split(", ");
+		
+		return chunks;
 	}
 
 	private String searchDriveWWN(String line, int start_index)
@@ -200,10 +273,26 @@ public class TapeTaskParser implements ParserInterface
 	{
 		// Convert the task_map to an ArrayList<Task>
 		ArrayList<Task> task_list = new ArrayList<Task>();
+		Task task;
 
 		for(String key : task_map.keySet())
 		{
-			task_list.add(task_map.get(key));
+			task = task_map.get(key);
+
+			// Catch to overwrite the "skip"
+			// type, even though it is being filtered
+			// out in testing. Not sure why it's being
+			// stored.
+			if(key.contains("Read"))
+			{
+				task.type = "GET";
+			}
+			else if(key.contains("Write"))
+			{
+				task.type = "PUT";
+			}
+
+			task_list.add(task);
 		}
 
 		return task_list;
@@ -228,6 +317,10 @@ public class TapeTaskParser implements ParserInterface
 	private void updateTask(String task_id, Task task)
 	{
 		// Adds or overwrites the task with the updated info.
+		if(task.type.equals("skip"))
+		{
+			System.out.println(task.type);
+		}
 		task_map.put(task_id, task);
 	}
 }
