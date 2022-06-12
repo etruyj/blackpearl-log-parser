@@ -23,8 +23,6 @@ public class BZIP2
 {
 	public static boolean decompress(String filepath, Logger log)
 	{
-		System.err.println(filepath.substring(filepath.length()-3, filepath.length()));
-
 		if(filepath.substring(filepath.length()-3, filepath.length()).equals("bz2"))
 		{
 			try
