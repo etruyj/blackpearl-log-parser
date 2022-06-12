@@ -1,4 +1,4 @@
-package com.socialvagrancy.blackpearl.logs.utils;
+package com.socialvagrancy.blackpearl.logs.utils.inputs;
 
 import java.io.BufferedReader;
 import java.io.File;

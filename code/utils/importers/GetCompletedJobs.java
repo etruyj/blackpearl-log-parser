@@ -1,7 +1,7 @@
-package com.socialvagrancy.blackpearl.logs.commands;
+package com.socialvagrancy.blackpearl.logs.utils.importers;
 
 import com.socialvagrancy.blackpearl.logs.structures.CompletedJob;
-import com.socialvagrancy.blackpearl.logs.utils.LoadFile;
+import com.socialvagrancy.blackpearl.logs.utils.inputs.LoadFile;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
