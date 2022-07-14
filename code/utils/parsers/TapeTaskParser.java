@@ -85,7 +85,7 @@ public class TapeTaskParser implements ParserInterface
 
 		if(line.contains(drive_search))
 		{
-			task.drive_wwn = searchDriveWWN(line, line.indexOf(drive_search) + drive_search.length());
+			task.sd_copy.get(task.copies).target = searchDriveWWN(line, line.indexOf(drive_search) + drive_search.length());
 		}
 		else if(line.contains(chunk_search))
 		{
@@ -93,15 +93,15 @@ public class TapeTaskParser implements ParserInterface
 		}
 		else if(line.contains(completion_search))
 		{
-			task.date_completed = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).date_completed = searchTimeStamp(line);
 		}
 		else if(line.contains(throughput_search))
 		{
-			task.throughput = searchThroughput(line, line.indexOf(throughput_search) + throughput_search.length());
+			task.sd_copy.get(task.copies).throughput = searchThroughput(line, line.indexOf(throughput_search) + throughput_search.length());
 		}
 		else if(line.contains(creation_search))
 		{
-			task.created_at = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).created_at = searchTimeStamp(line);
 		}
 		else
 		{
@@ -134,10 +134,11 @@ public class TapeTaskParser implements ParserInterface
 		String creation_search = "Locked Tape Drive";
 		String drive_search = "RPC TapeDrive$";
 		String throughput_search = "quiesced to tape";
-		
+		String storage_domain_search = "storage domains remaining";
+
 		if(line.contains(creation_search))
 		{
-			task.created_at = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).created_at = searchTimeStamp(line);
 		}
 		else if(line.contains(chunk_search) && task.chunk_id == null)
 		{
@@ -149,16 +150,21 @@ public class TapeTaskParser implements ParserInterface
 		}
 		else if(line.contains(drive_search))
 		{
-			task.drive_wwn = searchDriveWWN(line, line.indexOf(drive_search) + drive_search.length());
+			task.sd_copy.get(task.copies).target = searchDriveWWN(line, line.indexOf(drive_search) + drive_search.length());
 		}
 		else if(line.contains(completion_search))
 		{
-			task.date_completed = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).date_completed = searchTimeStamp(line);
 		}
 		else if(line.contains(throughput_search))
 		{
 			String sub_search = "effectively ";
-			task.throughput = searchThroughput(line, line.indexOf(sub_search) + sub_search.length());
+			task.sd_copy.get(task.copies).throughput = searchThroughput(line, line.indexOf(sub_search) + sub_search.length());
+		}
+		else if(line.contains(storage_domain_search))
+		{
+			task.copies++;
+			task.nextCopy();
 		}
 		else
 		{

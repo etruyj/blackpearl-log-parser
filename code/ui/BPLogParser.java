@@ -23,6 +23,7 @@ public class BPLogParser
 				Display.fromFile("../lib/help/version.txt");
 				break;
 			default:
+				System.err.println(command);
 				System.err.println("Invalid command selected. Please use --help or -h to see available commands.");
 				break;
 		}

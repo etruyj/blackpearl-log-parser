@@ -21,7 +21,7 @@ public class GetTapeTasks
 		GetTapeTasks.fromDataplanner(args[0], 8, null);
 	}
 
-	private static ArrayList<Task> fromDataplanner(String log_dir, int log_count, Logger log)
+	public static ArrayList<Task> fromDataplanner(String log_dir, int log_count, Logger log)
 	{
 		String log_name = "logs/var.log.dataplanner-main.log";
 		String file_name;
@@ -53,8 +53,11 @@ public class GetTapeTasks
 	{
 		for(int i=0; i<task_list.size(); i++)
 		{
-			System.out.println(task_list.get(i).id + " " + task_list.get(i).type + " " + task_list.get(i).drive_wwn + " " + task_list.get(i).created_at + " " + task_list.get(i).date_completed + " " + task_list.get(i).throughput);
+			for(int k=0; k<=task_list.get(i).copies; k++)
+			{
+				System.out.println(task_list.get(i).id + " " + task_list.get(i).type + " " + task_list.get(i).copies + " " + task_list.get(i).sd_copy.get(k).target + " " + task_list.get(i).sd_copy.get(k).created_at + " " + task_list.get(i).sd_copy.get(k).date_completed + " " + task_list.get(i).sd_copy.get(k).throughput);
 			
+			}
 			if(task_list.get(i).chunk_id != null)
 			{
 				for(int j=0; j<task_list.get(i).chunk_id.length; j++)

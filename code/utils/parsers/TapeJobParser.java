@@ -120,7 +120,7 @@ public class TapeJobParser implements ParserInterface
 		{
 			drive = drive.substring(0, drive.indexOf(":"));
 		}
-		else
+		else if(drive.contains(")"))
 		{
 			drive = drive.substring(0, drive.indexOf(")"));
 		}

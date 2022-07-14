@@ -5,7 +5,7 @@
 // 		all the job IDs to chunks.
 //===================================================================
 
-package com.socialvagrancy.blackpearl.logs.utils.imports;
+package com.socialvagrancy.blackpearl.logs.utils.importers;
 
 import com.socialvagrancy.blackpearl.logs.utils.inputs.LogReader;
 import com.socialvagrancy.blackpearl.logs.utils.parsers.JobIDtoChunkParser;
@@ -45,7 +45,7 @@ public class GetJobIDtoChunkMap
 
 		id_map = parser.getIDMap();
 	
-		print(id_map);
+		//print(id_map);
 
 		return id_map;
 		

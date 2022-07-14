@@ -19,7 +19,7 @@ public class DeleteFile
 
 		if(myFile.delete())
 		{
-			log.INFO("File [" + file_path + "] deleted successfull.");
+			log.INFO("File [" + file_path + "] deleted successfully.");
 		}
 		else
 		{
