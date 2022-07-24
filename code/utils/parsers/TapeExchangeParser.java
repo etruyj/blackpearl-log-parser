@@ -141,6 +141,7 @@ public class TapeExchangeParser implements ParserInterface
 		// Clean up the TGT) dispatched
 		line_parts[1] = line_parts[1].substring(0, line_parts[1].indexOf(")"));
 
+		exch.start_time = searchTimestamp(line);
 		exch.source = line_parts[0];
 		exch.target = line_parts[1];
 		exch.partition_id = searchPartition(line);

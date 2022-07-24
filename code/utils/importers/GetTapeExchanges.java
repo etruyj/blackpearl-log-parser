@@ -44,7 +44,7 @@ public class GetTapeExchanges
 				file_name = log_name;
 			}
 
-			System.out.println(dir_path + file_name);
+			System.err.println(dir_path + file_name);
 			LogReader.readLog(dir_path + file_name, parser, log);
 
 			if(i>-1)
@@ -52,8 +52,6 @@ public class GetTapeExchanges
 				DeleteFile.delete(dir_path + file_name, log);
 			}
 		}
-
-		System.out.println(parser.getExchangeList().size());
 
 		return parser.getExchangeList();
 	}

@@ -69,16 +69,17 @@ public class BPLogDateConverter
 		return stamp.format(in_format);
 	}
 
-	public static LocalDateTime formatDataPlannerTimestamp(String timestamp)
+	public static String formatDataPlannerTimestamp(String timestamp)
 	{
-		timestamp = reconstituteTimestamp(timestamp.substring(0, timestamp.length()-4));
+		timestamp = reconstituteTimestamp(timestamp);
 		DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		LocalDateTime converted_timestamp = LocalDateTime.parse(timestamp, out_format);
 
-		return LocalDateTime.parse(timestamp, out_format);
+		return converted_timestamp.format(out_format);
 		
 	}
 
-	public static LocalDateTime formatTapeBackendTimestamp(String timestamp)
+	public static String formatTapeBackendTimestamp(String timestamp)
 	{
 		if(timestamp == null)
 		{
@@ -89,9 +90,25 @@ public class BPLogDateConverter
 			timestamp = reconstituteTimestamp(timestamp);
 			DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 
-			return LocalDateTime.parse(timestamp, out_format);
+			return LocalDateTime.parse(timestamp, out_format).format(out_format);
 		}
 	}
+
+/*	PENDING DELETE
+ *	Not sure of the purpose of this function
+ *
+ * 	public static LocalDateTime formatForComparison(String timestamp)
+	{
+		if(timestamp == null)
+		{
+			return null;
+		}
+		else
+		{
+			timestamp = re
+		}
+	}
+*/
 
 	//=======================================
 	// Internal Functions

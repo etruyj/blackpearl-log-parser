@@ -98,6 +98,9 @@ public class TapeTaskParser implements ParserInterface
 		else if(line.contains(throughput_search))
 		{
 			task.sd_copy.get(task.copies).throughput = searchThroughput(line, line.indexOf(throughput_search) + throughput_search.length());
+			
+			// Grab the job size as well, since this is in the same line.
+			task.sd_copy.get(task.copies).size = searchSize(line);
 		}
 		else if(line.contains(creation_search))
 		{
@@ -160,6 +163,9 @@ public class TapeTaskParser implements ParserInterface
 		{
 			String sub_search = "effectively ";
 			task.sd_copy.get(task.copies).throughput = searchThroughput(line, line.indexOf(sub_search) + sub_search.length());
+			
+			// Grab the job size as well, since this is in the same line.
+			task.sd_copy.get(task.copies).size = searchSize(line);
 		}
 		else if(line.contains(storage_domain_search))
 		{
@@ -230,6 +236,20 @@ public class TapeTaskParser implements ParserInterface
 		// In the format of TapeDrive$#######.
 		String drive_sn = line.substring(start_index, line.indexOf("."));
 		return drive_sn; 
+	}
+
+	private String searchSize(String line)
+	{
+		// Returns the size of the job.
+		// This is included in the throughput line.
+		String task_size;
+		String[] line_parts = line.split("\\(");
+	
+		line_parts = line_parts[1].split("\\)");
+		
+		task_size = line_parts[0];
+
+		return task_size;
 	}
 
 	private String searchThroughput(String line, int start_index)

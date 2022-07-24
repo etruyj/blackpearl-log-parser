@@ -38,7 +38,7 @@ public class GetTapeTasks
 				file_name = log_name;
 			}
 		
-			System.out.println(log_dir + file_name);
+			System.err.println(log_dir + file_name);
 
 			LogReader.readLog(log_dir + file_name, task_parser, log);
 

@@ -13,5 +13,6 @@ public class StorageDomainCopy
 	public String target;
 	public String created_at;
 	public String date_completed;
+	public String size;
 	public String throughput;
 }

@@ -38,15 +38,14 @@ public class GetJobIDtoChunkMap
 			{
 				file_name = log_name;
 			}
-			System.out.println(dir_path + file_name);
+
+			System.err.println(dir_path + file_name);
 
 			LogReader.readLog(dir_path + file_name, parser, null);
 		}
 
 		id_map = parser.getIDMap();
 	
-		//print(id_map);
-
 		return id_map;
 		
 	}	

@@ -46,7 +46,7 @@ public class GetTapeJobs
 				file_name = log_name;
 			}
 
-			System.out.println(dir_path + file_name);
+			System.err.println(dir_path + file_name);
 			LogReader.readLog(dir_path + file_name, parser, null);
 
 			if(i!=-1)
