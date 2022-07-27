@@ -22,11 +22,13 @@ public class GetTapeJobs
 	public static void main(String[] args)
 	{
 		Logger log = new Logger("../logs/bp_parser.log", 1024, 1, 1);
-		GetTapeJobs.fromTapeBackend(args[0], 14, log);
+		GetTapeJobs.fromTapeBackend(args[0], 14, log, true);
 	}
 
-	public static ArrayList<TapeJob> fromTapeBackend(String dir_path, int log_count, Logger log)
+	public static ArrayList<TapeJob> fromTapeBackend(String dir_path, int log_count, Logger log, boolean debugging)
 	{
+		System.err.print("Importing tape jobs...\t\t");
+
 		String log_name = "logs/var.log.tape_backend.log";
 		String file_name;
 
@@ -46,7 +48,12 @@ public class GetTapeJobs
 				file_name = log_name;
 			}
 
-			System.err.println(dir_path + file_name);
+			if(debugging)
+			{
+				System.err.print("\n");
+				System.err.println(dir_path + file_name);
+			}
+
 			LogReader.readLog(dir_path + file_name, parser, null);
 
 			if(i!=-1)
@@ -54,6 +61,8 @@ public class GetTapeJobs
 				DeleteFile.delete(dir_path + file_name, log);
 			}
 		}
+
+		System.err.println("[COMPLETE]");
 
 		return parser.getJobList();
 	}

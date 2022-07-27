@@ -29,7 +29,7 @@ import java.util.TreeMap;
 public class GenerateTapeOperations
 {
 
-	public static ArrayList<TapeOperation> fromLogs(String dir_path, int dataplanner_log_count, int tape_backend_log_count, Logger log)
+	public static ArrayList<TapeOperation> fromLogs(String dir_path, int dataplanner_log_count, int tape_backend_log_count, Logger log, boolean debugging)
 	{
 		// The dataplanner and tape_backend logs are stitched together.
 		// The dataplanner task completed (date_completed) timestamp is used to
@@ -37,18 +37,18 @@ public class GenerateTapeOperations
 		// Once the tape job is located. The exchange that put that tape in the drive
 		// can be determined.
 
-		ArrayList<TapeOperation> ops_list = populateTasks(dir_path, dataplanner_log_count, log);
-		ops_list = populateTapeJobs(ops_list, dir_path, tape_backend_log_count, log);
-		ops_list = populateTapeExchanges(ops_list, dir_path, tape_backend_log_count, log);
+		ArrayList<TapeOperation> ops_list = populateTasks(dir_path, dataplanner_log_count, log, debugging);
+		ops_list = populateTapeJobs(ops_list, dir_path, tape_backend_log_count, log, debugging);
+		ops_list = populateTapeExchanges(ops_list, dir_path, tape_backend_log_count, log, debugging);
 
 		return ops_list;
 	}
 
-	private static ArrayList<TapeOperation> populateTapeExchanges(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, Logger log)
+	private static ArrayList<TapeOperation> populateTapeExchanges(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, Logger log, boolean debugging)
 	{
 		int exch_counter = 0;
 
-		ArrayList<TapeExchange> exch_list = GetTapeExchanges.fromTapeBackend(dir_path, tape_backend_log_count, log);
+		ArrayList<TapeExchange> exch_list = GetTapeExchanges.fromTapeBackend(dir_path, tape_backend_log_count, log, debugging);
 		
 		HashMap<String, TreeMap<LocalDateTime, TapeExchange>> exchange_map = MapTapeActivities.mapActivity(exch_list);
 		LocalDateTime start_time;
@@ -125,9 +125,9 @@ public class GenerateTapeOperations
 		return ops_list;
 	}
 
-	private static ArrayList<TapeOperation> populateTapeJobs(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, Logger log)
+	private static ArrayList<TapeOperation> populateTapeJobs(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, Logger log, boolean debugging)
 	{
-		ArrayList<TapeJob> job_list = GetTapeJobs.fromTapeBackend(dir_path, tape_backend_log_count, log);
+		ArrayList<TapeJob> job_list = GetTapeJobs.fromTapeBackend(dir_path, tape_backend_log_count, log, debugging);
 		HashMap<String, TreeMap<LocalDateTime, TapeJob>> job_map = MapTapeActivities.mapActivity(job_list);
 
 		// Time vars are created to easily reference
@@ -173,12 +173,12 @@ public class GenerateTapeOperations
 		return ops_list;
 	}	
 
-	private static ArrayList<TapeOperation> populateTasks(String dir_path, int dataplanner_log_count, Logger log)
+	private static ArrayList<TapeOperation> populateTasks(String dir_path, int dataplanner_log_count, Logger log, boolean debugging)
 	{
 		ArrayList<TapeOperation> ops_list = new ArrayList<TapeOperation>();
 		TapeOperation op;
 		
-		ArrayList<Task> task_list = GetTapeTasks.fromDataplanner(dir_path, dataplanner_log_count, log);
+		ArrayList<Task> task_list = GetTapeTasks.fromDataplanner(dir_path, dataplanner_log_count, log, debugging);
 
 		for(int i=0; i<task_list.size(); i++)
 		{

@@ -18,11 +18,13 @@ public class GetJobIDtoChunkMap
 {
 	public static void main(String[] args)
 	{
-		GetJobIDtoChunkMap.fromDataplanner(args[0], 8, null);
+		GetJobIDtoChunkMap.fromDataplanner(args[0], 8, null, true);
 	}
 
-	public static HashMap<String, ArrayList<String>> fromDataplanner(String dir_path, int log_count, Logger log)
+	public static HashMap<String, ArrayList<String>> fromDataplanner(String dir_path, int log_count, Logger log, boolean debugging)
 	{
+		System.err.print("Importing chunk info...\t\t");
+
 		JobIDtoChunkParser parser = new JobIDtoChunkParser();
 		HashMap<String, ArrayList<String>> id_map;
 		String log_name = "logs/var.log.dataplanner-main.log";
@@ -39,13 +41,19 @@ public class GetJobIDtoChunkMap
 				file_name = log_name;
 			}
 
-			System.err.println(dir_path + file_name);
+			if(debugging)
+			{
+				System.err.print("\n"); // Close header line: importing...
+				System.err.println(dir_path + file_name);
+			}
 
 			LogReader.readLog(dir_path + file_name, parser, null);
 		}
 
 		id_map = parser.getIDMap();
 	
+		System.err.println("[COMPLETE]");
+
 		return id_map;
 		
 	}	

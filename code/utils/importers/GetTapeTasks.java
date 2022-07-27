@@ -18,11 +18,13 @@ public class GetTapeTasks
 {
 	public static void main(String[] args)
 	{
-		GetTapeTasks.fromDataplanner(args[0], 8, null);
+		GetTapeTasks.fromDataplanner(args[0], 8, null, true);
 	}
 
-	public static ArrayList<Task> fromDataplanner(String log_dir, int log_count, Logger log)
+	public static ArrayList<Task> fromDataplanner(String log_dir, int log_count, Logger log, boolean debugging)
 	{
+		System.err.print("Importing tape tasks...\t\t");
+
 		String log_name = "logs/var.log.dataplanner-main.log";
 		String file_name;
 		TapeTaskParser task_parser = new TapeTaskParser();
@@ -38,13 +40,19 @@ public class GetTapeTasks
 				file_name = log_name;
 			}
 		
-			System.err.println(log_dir + file_name);
+			if(debugging)
+			{
+				System.err.print("\n"); // close out header line.
+				System.err.println(log_dir + file_name);
+			}
 
 			LogReader.readLog(log_dir + file_name, task_parser, log);
 
 		}
 
 		ArrayList<Task> task_list = task_parser.getTaskList();
+
+		System.err.println("[COMPLETE]");
 
 		return task_list;
 	}

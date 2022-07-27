@@ -2,6 +2,8 @@
 // MapPoolIDtoPool.java
 // 	Description:
 // 		Creates a HashMap of PoolID to PoolData.
+// 		Actually uses partition id instead of pool id as
+// 		partition id is the UUID.
 //===================================================================
 
 package com.socialvagrancy.blackpearl.logs.utils.linkers;
@@ -17,9 +19,12 @@ public class MapPoolIDtoPool
 	{
 		HashMap<String, Pools.PoolData> pool_map = new HashMap<String, Pools.PoolData>();
 
+		System.out.println("Test");
+		System.out.println("Pool count: " + pool_info.data.length);
+
 		for(int i=0; i<pool_info.data.length; i++)
 		{
-			pool_map.put(pool_info.data[i].id, pool_info.data[i]);
+			pool_map.put(pool_info.data[i].partition_id, pool_info.data[i]);
 		}
 
 		return pool_map;

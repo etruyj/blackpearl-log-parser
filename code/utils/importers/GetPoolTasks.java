@@ -18,12 +18,14 @@ public class GetPoolTasks
 {
 	public static void main(String[] args)
 	{
-		ArrayList<Task> task_list = GetPoolTasks.fromDataplanner(args[0], 8, null);
+		ArrayList<Task> task_list = GetPoolTasks.fromDataplanner(args[0], 8, null, true);
 		print(task_list);
 	}
 
-	public static ArrayList<Task> fromDataplanner(String dir_path, int log_count, Logger log)
+	public static ArrayList<Task> fromDataplanner(String dir_path, int log_count, Logger log, boolean debugging)
 	{
+		System.err.print("Importing pool tasks...\t\t");
+
 		String log_name = "logs/var.log.dataplanner-main.log";
 		String file_name;
 		PoolTaskParser pool_parser = new PoolTaskParser();
@@ -39,12 +41,18 @@ public class GetPoolTasks
 				file_name = dir_path + "/" + log_name;
 			}
 
-			System.err.println(file_name);
+			if(debugging)
+			{
+				System.err.print("\n"); // close off header
+				System.err.println(file_name);
+			}
 
 			LogReader.readLog(file_name, pool_parser, log);
 		}
 
 		ArrayList<Task> task_list = pool_parser.getTaskList();
+
+		System.err.println("[COMPLETE]");
 
 		return task_list;
 	}

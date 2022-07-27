@@ -10,6 +10,7 @@ package com.socialvagrancy.blackpearl.logs.structures;
 
 public class StorageDomainCopy
 {
+	public String target_id;
 	public String target;
 	public String created_at;
 	public String date_completed;

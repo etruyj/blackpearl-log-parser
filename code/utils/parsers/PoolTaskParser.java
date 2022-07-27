@@ -16,13 +16,17 @@ public class PoolTaskParser implements ParserInterface
 {
 	ArrayList<Task> task_list;
 	HashMap<String, Task> task_map;
+	HashMap<String, String> id_name_map;
 	String write_task = "WriteChunkToPoolTask";
-	String read_task = "ReadChunkFromPoolTask";
+	String read_task = "IGNORE Read lock"; // Added IGNORE to skip search. Delete from string to resume searching.
+	String read_task_2 = "read_from_pool_id";
+	String search_pool_name = "Pool: ";
 
 	public PoolTaskParser()
 	{
 		task_list = new ArrayList<Task>();
 		task_map = new HashMap<String, Task>();
+		id_name_map = new HashMap<String, String>();
 	}
 
 	//=======================================
@@ -35,13 +39,22 @@ public class PoolTaskParser implements ParserInterface
 		String task_id;
 		Task task;
 
-		if(line.contains(write_task) || line.contains(read_task))
+		if(line.contains(write_task) || line.contains(read_task) || line.contains(read_task_2))
 		{
-			if(line.contains(read_task))
+			if(line.contains(read_task) || line.contains(read_task_2))
 			{
-				task_id = searchTaskID(line, read_task);
+				task_id = searchRPC(line);
 
-				//System.err.println(line);
+				task = getTask(task_id);
+				task.type = "GET";
+
+				task = parseRead(line, task);
+
+				// Don't update if no new info
+				if(!task.type.equals("skip"))
+				{
+					updateTask(task_id, task);
+				}
 			}
 			else if(line.contains(write_task))
 			{
@@ -61,6 +74,73 @@ public class PoolTaskParser implements ParserInterface
 				}
 			}
 		}
+		else if(line.contains(search_pool_name))
+		{
+			String[] id_name_pair = parseName(line);
+			id_name_map.put(id_name_pair[0], id_name_pair[1]);
+		}
+	}
+
+	public String[] parseName(String line)
+	{
+		String search_pool_id = "Pool: ";
+		String[] id_name_pair = new String[2];
+		String temp = line.substring(line.indexOf(search_pool_id) + search_pool_id.length(), line.length());
+		String[] line_parts = temp.split(" ");
+
+		// Set Pool ID
+		id_name_pair[0] = line_parts[0];
+
+		// Find Pool Name
+		line_parts = line_parts[1].split("\\(");
+		line_parts = line_parts[1].split("\\)");
+
+		id_name_pair[1] = line_parts[0];
+
+		return id_name_pair;
+	}
+
+	public Task parseRead(String line, Task task)
+	{
+		String search_created = "acquired";;
+		String search_completed = "released";
+
+		if(line.contains(read_task_2))
+		{
+			// Chunk
+			task.chunk_id = searchSQLForChunk(line);
+			
+			// Pool ID
+			task.sd_copy.get(task.copies).target_id = searchSQLForPoolID(line);
+		}
+/*		REMOVED FROM THE LOGIC
+ *			NOT SURE HOW TO ATTACH THESE DATA POINTS TO
+ *			THE OVERARCHING READ TASK.
+ *
+ * 		else if(line.contains(read_task))
+		{
+			if(line.contains(search_created))
+			{
+				// created at
+				task.sd_copy.get(task.copies).created_at = searchTimestamp(line);
+
+				// Pool ID
+			}
+			else if(line.contains(search_completed))
+			{
+				// date completed
+				task.sd_copy.get(task.copies).date_completed = searchTimestamp(line);
+				
+				// Pool ID
+			}
+		}
+*/
+		else
+		{
+			task.type = "skip";
+		}
+
+		return task;
 	}
 
 	public Task parseWrite(String line, Task task)
@@ -86,7 +166,7 @@ public class PoolTaskParser implements ParserInterface
 		else if(line.contains(search_pool))
 		{
 			// pool_id
-			task.sd_copy.get(task.copies).target = searchPoolID(line);
+			task.sd_copy.get(task.copies).target_id = searchPoolID(line);
 		}
 		else if(line.contains(search_throughput))
 		{
@@ -139,6 +219,39 @@ public class PoolTaskParser implements ParserInterface
 		return task_size;
 	}
 
+	private String searchRPC(String line)
+	{
+		String[] line_parts = line.split("\\[");
+		line_parts = line_parts[1].split("\\]");
+
+		String rpc_id = line_parts[0];
+
+		return rpc_id;
+	}
+
+	private String[] searchSQLForChunk(String line)
+	{
+		String[] line_parts = line.split(" VALUES ");
+		line_parts = line_parts[1].split(", ");
+
+		String[] chunk = new String[1];
+	       	chunk[0] = line_parts[4];	
+		chunk[0] = chunk[0].substring(1, chunk[0].length()-1); // strip the single-quotes.
+
+		return chunk;
+	}
+
+	private String searchSQLForPoolID(String line)
+	{
+		String[] line_parts = line.split(" VALUES ");
+		line_parts = line_parts[1].split(", ");
+
+		String pool_id = line_parts[1];
+		pool_id = pool_id.substring(1, pool_id.length()-1);
+
+		return pool_id;
+	}
+
 	private String searchTaskID(String line, String task_type)
 	{
 		String[] line_parts;
@@ -179,10 +292,19 @@ public class PoolTaskParser implements ParserInterface
 	private ArrayList<Task> buildTaskList()
 	{
 		ArrayList<Task> task_list = new ArrayList<Task>();
+		Task task;
 
 		for(String key : task_map.keySet())
 		{
-			task_list.add(task_map.get(key));
+			task = task_map.get(key);
+			
+			for(int i=0; i<task.sd_copy.size(); i++)
+			{
+				task.sd_copy.get(i).target = id_name_map.get(task.sd_copy.get(i).target_id);
+			}
+
+
+			task_list.add(task);
 		}
 
 		return task_list;

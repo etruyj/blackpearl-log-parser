@@ -37,20 +37,27 @@ public class Pools
 		public int special_available;
 		public int special_used;
 		public String[] disk_ids;
-		public Topology topology;
+		public Topology[] topology;
 		public String[] log;
 		public String[] zil_drives;
 		public String[] special;
 		public String[] special_drives;
 		public String[] special_disk_ids;
 		public String type;
+		public String ds3_pool_health;
+		public String ds3_pool_type;
+		public String partition_id;
+		public BigInteger total_capacity;
+		public boolean assigned_to_storage_domain;
+		public String storage_domain_member_id;
+		public String quiesced;
 	}
 
 	public class Topology
 	{
 		public String type;
 		public String health;
-		public TopoChild children;
+		public TopoChild[] children;
 	}
 
 	public class TopoChild extends Topology
