@@ -12,19 +12,11 @@ import com.socialvagrancy.blackpearl.logs.structures.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TapeTaskParser implements ParserInterface
+public class TapeTaskParser extends DataplannerParser
 {
-	ArrayList<Task> task_list;
-	HashMap<String, Task> task_map;
 	String write_task = "WriteChunkToTapeTask#";
 	String read_task = "ReadChunkFromTapeTask#";
 	
-	public TapeTaskParser()
-	{
-		task_list = new ArrayList<Task>();
-		task_map = new HashMap<String, Task>();
-	}
-
 	//=======================================
 	// Line Parsing
 	//=======================================
@@ -40,7 +32,7 @@ public class TapeTaskParser implements ParserInterface
 
 			if(line.contains(read_task))
 			{
-				task_id = parseTaskID(line, read_task);
+				task_id = searchTaskID(line, read_task);
 			
 				task = getTask(task_id);	
 			
@@ -56,7 +48,7 @@ public class TapeTaskParser implements ParserInterface
 			}
 			else if(line.contains(write_task))
 			{
-				task_id = parseTaskID(line, write_task);
+				task_id = searchTaskID(line, write_task);
 		
 				task = getTask(task_id);
 				
@@ -93,7 +85,7 @@ public class TapeTaskParser implements ParserInterface
 		}
 		else if(line.contains(completion_search))
 		{
-			task.sd_copy.get(task.copies).date_completed = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).date_completed = searchTimestamp(line);
 		}
 		else if(line.contains(throughput_search))
 		{
@@ -104,7 +96,7 @@ public class TapeTaskParser implements ParserInterface
 		}
 		else if(line.contains(creation_search))
 		{
-			task.sd_copy.get(task.copies).created_at = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).created_at = searchTimestamp(line);
 		}
 		else
 		{
@@ -113,20 +105,6 @@ public class TapeTaskParser implements ParserInterface
 		}
 
 		return task;
-	}
-
-	public String parseTaskID(String line, String task_type)
-	{
-		// Located the ReadChunkToTapeTask or WriteChunkToTapeTask #
-		// Usually is either a bracketed value or followed by a bracketed value.
-		// Start with ] to ensure the task_id is at index 0
-		String[] line_parts;
-		String task_id = line.substring(line.indexOf(task_type), line.length());
-		line_parts = task_id.split("\\]");
-		line_parts = line_parts[0].split("\\[");
-		task_id = line_parts[0];
-
-		return task_id;
 	}
 
 	public Task parseWrite(String line, Task task)
@@ -141,7 +119,7 @@ public class TapeTaskParser implements ParserInterface
 
 		if(line.contains(creation_search))
 		{
-			task.sd_copy.get(task.copies).created_at = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).created_at = searchTimestamp(line);
 		}
 		else if(line.contains(chunk_search) && task.chunk_id == null)
 		{
@@ -157,7 +135,7 @@ public class TapeTaskParser implements ParserInterface
 		}
 		else if(line.contains(completion_search))
 		{
-			task.sd_copy.get(task.copies).date_completed = searchTimeStamp(line);
+			task.sd_copy.get(task.copies).date_completed = searchTimestamp(line);
 		}
 		else if(line.contains(throughput_search))
 		{
@@ -238,115 +216,5 @@ public class TapeTaskParser implements ParserInterface
 		return drive_sn; 
 	}
 
-	private String searchSize(String line)
-	{
-		// Returns the size of the job.
-		// This is included in the throughput line.
-		String task_size;
-		String[] line_parts = line.split("\\(");
-	
-		line_parts = line_parts[1].split("\\)");
-		
-		task_size = line_parts[0];
 
-		return task_size;
-	}
-
-	private String searchThroughput(String line, int start_index)
-	{
-		// Return the throughput.
-		// Uses line splits as all the search characters occur repeatedly
-		// in the string.
-
-		String throughput = line.substring(start_index, line.length());
-		String[] line_parts = throughput.split(" ");
-		throughput = line_parts[0] + " " + line_parts[1];
-		
-		return throughput;
-	}
-
-	private String searchTimeStamp(String line)
-	{
-		// Find the MMM dd hh:mm:ss timestamp.
-		String[] line_parts = line.split(" ");
-		String timestamp = line_parts[1] + " " + line_parts[2];
-		line_parts = line_parts[3].split(",");
-		timestamp += " " + line_parts[0];
-
-		return timestamp;
-	}
-
-	//=======================================
-	// Getters
-	//=======================================
-	
-	public ArrayList<Task> getTaskList()
-	{
-		// Convert the task_maps to ArrayLists 
-		// before returning the array list.
-		// This seems to be the best place to make
-		// this call.
-		task_list.addAll(buildTaskList(task_map));
-
-		return task_list;
-	}
-
-	//=======================================
-	// Functions
-	//=======================================
-
-	private ArrayList<Task> buildTaskList(HashMap<String, Task> task_map)
-	{
-		// Convert the task_map to an ArrayList<Task>
-		ArrayList<Task> task_list = new ArrayList<Task>();
-		Task task;
-
-		for(String key : task_map.keySet())
-		{
-			task = task_map.get(key);
-
-			// Catch to overwrite the "skip"
-			// type, even though it is being filtered
-			// out in testing. Not sure why it's being
-			// stored.
-			if(key.contains("Read"))
-			{
-				task.type = "GET";
-			}
-			else if(key.contains("Write"))
-			{
-				task.type = "PUT";
-			}
-
-			task_list.add(task);
-		}
-
-		return task_list;
-	}
-
-	private Task getTask(String task_id)
-	{
-		// Find out which task is being edited.
-		// If the task doesn't exist in the map,
-		// create a new one.
-
-		Task task = task_map.get(task_id);
-
-		if(task == null)
-		{
-			task = new Task();
-		}
-
-		return task;
-	}
-
-	private void updateTask(String task_id, Task task)
-	{
-		// Adds or overwrites the task with the updated info.
-		if(task.type.equals("skip"))
-		{
-			System.out.println(task.type);
-		}
-		task_map.put(task_id, task);
-	}
 }

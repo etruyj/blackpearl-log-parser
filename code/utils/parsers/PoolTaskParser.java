@@ -12,10 +12,8 @@ import com.socialvagrancy.blackpearl.logs.structures.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PoolTaskParser implements ParserInterface
+public class PoolTaskParser extends DataplannerParser
 {
-	ArrayList<Task> task_list;
-	HashMap<String, Task> task_map;
 	HashMap<String, String> id_name_map;
 	String write_task = "WriteChunkToPoolTask";
 	String read_task = "IGNORE Read lock"; // Added IGNORE to skip search. Delete from string to resume searching.
@@ -207,7 +205,7 @@ public class PoolTaskParser implements ParserInterface
 
 		return pool;
 	}
-
+/*
 	private String searchSize(String line)
 	{
 		// Return the size of the task being completed.
@@ -218,7 +216,7 @@ public class PoolTaskParser implements ParserInterface
 		
 		return task_size;
 	}
-
+*/
 	private String searchRPC(String line)
 	{
 		String[] line_parts = line.split("\\[");
@@ -251,7 +249,7 @@ public class PoolTaskParser implements ParserInterface
 
 		return pool_id;
 	}
-
+/*
 	private String searchTaskID(String line, String task_type)
 	{
 		String[] line_parts;
@@ -263,7 +261,7 @@ public class PoolTaskParser implements ParserInterface
 
 		return task_id;
 	}
-
+*/
 	private String searchThroughput(String line)
 	{
 		String search_start = "at ";
@@ -272,7 +270,7 @@ public class PoolTaskParser implements ParserInterface
 
 		return throughput;
 	}
-
+/*
 	private String searchTimestamp(String line)
 	{
 		// Returns the MMM dd HH:mm:ss timestamp from the
@@ -284,11 +282,11 @@ public class PoolTaskParser implements ParserInterface
 
 		return timestamp;
 	}
-
+*/
 	//=======================================
 	// FUNCTIONS
 	//=======================================
-
+	
 	private ArrayList<Task> buildTaskList()
 	{
 		ArrayList<Task> task_list = new ArrayList<Task>();
@@ -309,7 +307,7 @@ public class PoolTaskParser implements ParserInterface
 
 		return task_list;
 	}
-
+/*
 	private Task getTask(String task_id)
 	{
 		Task task = task_map.get(task_id);
@@ -336,5 +334,6 @@ public class PoolTaskParser implements ParserInterface
 			task_map.put(task_id, task);
 		}
 	}
+*/
 }
 
