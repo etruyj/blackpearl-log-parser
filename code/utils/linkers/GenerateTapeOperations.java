@@ -154,6 +154,8 @@ public class GenerateTapeOperations
 				// Find the job time that occured for the ops_list.drive_wwn 
 				// just before the test time.
 				job_time = job_map.get(ops_list.get(i).drive_wwn).lowerKey(test_time);
+				
+				System.err.println(ops_list.get(i).id + " " + ops_list.get(i).task_created + " " + ops_list.get(i).task_completed);
 
 				// Store the job that occured at that time.
 				job = job_map.get(ops_list.get(i).drive_wwn).get(job_time);
@@ -187,7 +189,7 @@ public class GenerateTapeOperations
 			for(int j=0; j<=task_list.get(i).copies; j++)
 			{
 				op = new TapeOperation();
-			
+
 				op.id = task_list.get(i).id;
 				op.request_type = task_list.get(i).type;
 				op.chunk_id = task_list.get(i).chunk_id;
@@ -196,6 +198,17 @@ public class GenerateTapeOperations
 				op.task_completed = BPLogDateConverter.formatDataPlannerTimestamp(task_list.get(i).sd_copy.get(j).date_completed);
 				op.task_size = task_list.get(i).sd_copy.get(j).size;
 				op.task_throughput = task_list.get(i).sd_copy.get(j).throughput;
+			
+				if(op.id.equals("WriteChunkToTapeTask#15105"))
+				{
+					System.err.println("Task: " + op.id);
+					System.err.println("\t" + task_list.get(i).sd_copy.get(j).created_at + " " + task_list.get(i).sd_copy.get(j).date_completed);
+					System.err.println("\t" + op.task_created + " " + op.task_completed);
+					for(int m=0; m < op.chunk_id.length; m++)
+					{
+						System.err.println("\t- " + op.chunk_id[m]);
+					}
+				}
 
 				ops_list.add(op);
 			}

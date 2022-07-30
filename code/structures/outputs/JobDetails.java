@@ -7,6 +7,7 @@
 
 package com.socialvagrancy.blackpearl.logs.structures.outputs;
 
+import com.socialvagrancy.blackpearl.logs.structures.operations.DS3Operation;
 import com.socialvagrancy.blackpearl.logs.structures.operations.PoolOperation;
 import com.socialvagrancy.blackpearl.logs.structures.operations.TapeOperation;
 import com.socialvagrancy.blackpearl.logs.structures.CompletedJob;
@@ -19,11 +20,13 @@ public class JobDetails
 	public CompletedJob.JobInfo job_info;
 	public HashMap<String, ArrayList<TapeOperation>> tape_copies;
 	public HashMap<String, ArrayList<PoolOperation>> pool_copies;
+	public HashMap<String, ArrayList<DS3Operation>> ds3_copies;
 
 	public JobDetails()
 	{
 		tape_copies = new HashMap<String, ArrayList<TapeOperation>>();
 		pool_copies = new HashMap<String, ArrayList<PoolOperation>>();
+		ds3_copies = new HashMap<String, ArrayList<DS3Operation>>();
 	}
 
 	//=======================================
@@ -54,9 +57,22 @@ public class JobDetails
 		}
 	}
 
+	public int ds3CopyCount(String chunk)
+	{
+		if(ds3_copies.get(chunk) == null)
+		{
+			return 0;
+		}
+		else
+		{
+			return ds3_copies.get(chunk).size();
+		}
+	}
+
 	//=======================================
 	// Settings
 	//=======================================
 	
 	public void addPoolInfo(String chunk, ArrayList<PoolOperation> ops_list) { pool_copies.put(chunk, ops_list); }
+	public void addDS3Info(String chunk, ArrayList<DS3Operation> ops_list) { ds3_copies.put(chunk, ops_list); }
 }

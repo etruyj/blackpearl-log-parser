@@ -51,7 +51,7 @@ public class TapeTaskParser extends DataplannerParser
 				task_id = searchTaskID(line, write_task);
 		
 				task = getTask(task_id);
-				
+
 				task.id = task_id;	
 				task.type = "PUT";
 				task = parseWrite(line, task);
@@ -115,6 +115,7 @@ public class TapeTaskParser extends DataplannerParser
 		String creation_search = "Locked Tape Drive";
 		String drive_search = "RPC TapeDrive$";
 		String throughput_search = "quiesced to tape";
+		String reaggregation_search = "since it can be re-aggregated.";
 		String storage_domain_search = "storage domains remaining";
 
 		if(line.contains(creation_search))
@@ -145,8 +146,28 @@ public class TapeTaskParser extends DataplannerParser
 			// Grab the job size as well, since this is in the same line.
 			task.sd_copy.get(task.copies).size = searchSize(line);
 		}
+		else if(line.contains(reaggregation_search))
+		{
+			// The task was removed and the chunks are added to a different tape task.
+			// Not sure how to filter these out at this stage.
+			// Right now, I'll delete the chunks from the task since I have a flag to 
+			// filter out chunk-less tasks.
+			
+			//task.chunk_id = null;
+			
+			// Process 2 for tracking purposes
+			task.sd_copy.get(task.copies).date_completed = searchTimestamp(line);
+		}
 		else if(line.contains(storage_domain_search))
 		{
+			// Mark the first task as completed before starting to store the next task.
+			// If there are multiple tape copies it looks like this message comes
+			// just before the task is listed as complete.
+			if(task.sd_copy.get(task.copies).date_completed == null)
+			{
+				task.sd_copy.get(task.copies).date_completed = searchTimestamp(line);
+			}
+
 			task.copies++;
 			task.nextCopy();
 		}
@@ -155,7 +176,13 @@ public class TapeTaskParser extends DataplannerParser
 			// No updates to task
 			task.type = "skip";
 		}
-		
+	
+
+		if(task.id.equals("WriteChunkToTapeTask#295"))
+		{
+			System.err.println("Task check: " + task.sd_copy.get(task.copies).created_at + " " + task.sd_copy.get(task.copies).date_completed);
+		}
+
 		return task;
 	}
 

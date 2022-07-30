@@ -1,23 +1,23 @@
 //===================================================================
-// MapPoolOperationstoChunk.java
+// MapDS3OperationstoChunk.java
 // 	Description:
-// 		Creates a HashMap<String, ArrayList<PoolOperation>> to
-// 		allow searching the pool operations by the job's chunk.
+// 		Creates a HashMap<String, ArrayList<DS3Operation>> to
+// 		allow searching the ds3 operations by the job's chunk.
 //===================================================================
 
 package com.socialvagrancy.blackpearl.logs.utils.linkers;
 
-import com.socialvagrancy.blackpearl.logs.structures.operations.PoolOperation;
+import com.socialvagrancy.blackpearl.logs.structures.operations.DS3Operation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MapPoolOperationsToChunk
+public class MapDS3OperationsToChunk
 {
-	public static HashMap<String, ArrayList<PoolOperation>> createMap(ArrayList<PoolOperation> ops_list)
+	public static HashMap<String, ArrayList<DS3Operation>> createMap(ArrayList<DS3Operation> ops_list)
 	{
-		HashMap<String, ArrayList<PoolOperation>> ops_map = new HashMap<String, ArrayList<PoolOperation>>();
-		ArrayList<PoolOperation> map_list;
+		HashMap<String, ArrayList<DS3Operation>> ops_map = new HashMap<String, ArrayList<DS3Operation>>();
+		ArrayList<DS3Operation> map_list;
 		
 		for(int i=0; i<ops_list.size(); i++)
 		{
@@ -25,7 +25,7 @@ public class MapPoolOperationsToChunk
 			{
 				if(ops_map.get(ops_list.get(i).chunks[j]) == null)
 				{
-					map_list = new ArrayList<PoolOperation>();
+					map_list = new ArrayList<DS3Operation>();
 					map_list.add(ops_list.get(i));
 					
 				}

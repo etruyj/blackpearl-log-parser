@@ -71,12 +71,18 @@ public class BPLogDateConverter
 
 	public static String formatDataPlannerTimestamp(String timestamp)
 	{
-		timestamp = reconstituteTimestamp(timestamp);
-		DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
-		LocalDateTime converted_timestamp = LocalDateTime.parse(timestamp, out_format);
+		if(timestamp == null)
+		{
+			return "2001 Jan 01 00:00:01";
+		}
+		else
+		{
+			timestamp = reconstituteTimestamp(timestamp);
+			DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+			LocalDateTime converted_timestamp = LocalDateTime.parse(timestamp, out_format);
 
-		return converted_timestamp.format(out_format);
-		
+			return converted_timestamp.format(out_format);
+		}
 	}
 
 	public static String formatTapeBackendTimestamp(String timestamp)

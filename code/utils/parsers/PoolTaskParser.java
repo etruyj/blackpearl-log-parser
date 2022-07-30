@@ -35,23 +35,28 @@ public class PoolTaskParser extends DataplannerParser
 	public void parseLine(String line)
 	{
 		String task_id;
+		String job_id;
 		Task task;
+		String sql_filter = "COPY";
+		String delete_search = "DELETE FROM ds3.job";
 
-		if(line.contains(write_task) || line.contains(read_task) || line.contains(read_task_2))
+		if(line.contains(write_task) || ((line.contains(read_task) || line.contains(read_task_2)) && !line.contains(sql_filter)))
 		{
 			if(line.contains(read_task) || line.contains(read_task_2))
 			{
+				job_id = searchJobIDCreation(line);
 				task_id = searchRPC(line);
 
-				task = getTask(task_id);
+				task = getTask(job_id);
+				task.id = task_id;
 				task.type = "GET";
-
+				
 				task = parseRead(line, task);
 
 				// Don't update if no new info
 				if(!task.type.equals("skip"))
 				{
-					updateTask(task_id, task);
+					updateTask(job_id, task);
 				}
 			}
 			else if(line.contains(write_task))
@@ -70,6 +75,19 @@ public class PoolTaskParser extends DataplannerParser
 				{
 					updateTask(task_id, task);
 				}
+			}
+		}
+		else if(line.contains(delete_search))
+		{
+			job_id = searchJobIDDeletion(line);
+
+			task = getTask(job_id);
+			
+			if(task.id != null)
+			{
+				task.sd_copy.get(task.copies).date_completed = searchTimestamp(line);
+
+				updateTask(job_id, task);
 			}
 		}
 		else if(line.contains(search_pool_name))
@@ -105,11 +123,15 @@ public class PoolTaskParser extends DataplannerParser
 
 		if(line.contains(read_task_2))
 		{
+			// Created at - Since I haven't found a better method
+			task.sd_copy.get(task.copies).created_at = searchTimestamp(line);
+
 			// Chunk
 			task.chunk_id = searchSQLForChunk(line);
 			
 			// Pool ID
 			task.sd_copy.get(task.copies).target_id = searchSQLForPoolID(line);
+
 		}
 /*		REMOVED FROM THE LOGIC
  *			NOT SURE HOW TO ATTACH THESE DATA POINTS TO
@@ -205,18 +227,37 @@ public class PoolTaskParser extends DataplannerParser
 
 		return pool;
 	}
-/*
-	private String searchSize(String line)
+	
+	private String searchJobIDCreation(String line)
 	{
-		// Return the size of the task being completed.
-		String task_size;
-		String[] line_parts = line.split("\\(");
-		line_parts = line_parts[1].split("\\)");
-		task_size = line_parts[0];
-		
-		return task_size;
+		String[] line_parts = line.split(" VALUES ");
+		line_parts = line_parts[1].split(", ");
+		String job_id = line_parts[2].substring(1, line_parts[2].length()-1); // substring(1, length()-1) to strip single quotes
+
+		return job_id;
 	}
-*/
+
+	private String searchJobIDDeletion(String line)
+	{
+		String id_search = "WHERE id = ";
+		String array_search = "ANY ('"; 
+		String id_end = "' [";
+		String job_id;
+		int starting_char = line.indexOf(id_search) + id_search.length() + 1; // +1 for the leading quote or square bracket.
+
+		// Some reason there is an array input as well.
+		// This allows for parsing the second type of SQL deletion.
+		if(line.contains(array_search))
+		{
+			starting_char += array_search.length();
+			id_end = "]')";
+		}
+
+		job_id = line.substring(starting_char, line.indexOf(id_end));
+
+		return job_id;
+	}
+
 	private String searchRPC(String line)
 	{
 		String[] line_parts = line.split("\\[");
@@ -230,7 +271,16 @@ public class PoolTaskParser extends DataplannerParser
 	private String[] searchSQLForChunk(String line)
 	{
 		String[] line_parts = line.split(" VALUES ");
-		line_parts = line_parts[1].split(", ");
+		
+		try
+		{	
+			line_parts = line_parts[1].split(", ");
+		}
+		catch(Exception e)
+		{
+			System.err.println(e.getMessage());
+			System.err.println(line);
+		}
 
 		String[] chunk = new String[1];
 	       	chunk[0] = line_parts[4];	
@@ -249,19 +299,7 @@ public class PoolTaskParser extends DataplannerParser
 
 		return pool_id;
 	}
-/*
-	private String searchTaskID(String line, String task_type)
-	{
-		String[] line_parts;
-		String task_id = line.substring(line.indexOf(task_type), line.length());
-
-		line_parts = task_id.split("\\]");
-		line_parts = line_parts[0].split("\\[");
-		task_id = line_parts[0];
-
-		return task_id;
-	}
-*/
+	
 	private String searchThroughput(String line)
 	{
 		String search_start = "at ";
@@ -270,19 +308,7 @@ public class PoolTaskParser extends DataplannerParser
 
 		return throughput;
 	}
-/*
-	private String searchTimestamp(String line)
-	{
-		// Returns the MMM dd HH:mm:ss timestamp from the
-		// log line.
-		String[] line_parts = line.split(" ");
-		String timestamp = line_parts[1] + " " + line_parts[2];
-		line_parts = line_parts[3].split(",");
-		timestamp += " " + line_parts[0];
-
-		return timestamp;
-	}
-*/
+	
 	//=======================================
 	// FUNCTIONS
 	//=======================================
@@ -296,6 +322,8 @@ public class PoolTaskParser extends DataplannerParser
 		{
 			task = task_map.get(key);
 			
+
+			// Add the human-readable pool name to the Task.
 			for(int i=0; i<task.sd_copy.size(); i++)
 			{
 				task.sd_copy.get(i).target = id_name_map.get(task.sd_copy.get(i).target_id);
@@ -307,33 +335,12 @@ public class PoolTaskParser extends DataplannerParser
 
 		return task_list;
 	}
-/*
-	private Task getTask(String task_id)
-	{
-		Task task = task_map.get(task_id);
-
-		if(task == null)
-		{
-			task = new Task();
-		}
-
-		return task;
-	}
-
+	
+	@Override
 	public ArrayList<Task> getTaskList() 
 	{ 
 		task_list.addAll(buildTaskList());
 		return task_list;
        	}
-
-	private void updateTask(String task_id, Task task)
-	{
-		// Double-check this field.
-		if(!task.type.equals("skip"))
-		{
-			task_map.put(task_id, task);
-		}
-	}
-*/
 }
 

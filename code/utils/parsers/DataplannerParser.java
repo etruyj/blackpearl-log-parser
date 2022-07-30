@@ -121,7 +121,21 @@ public abstract class DataplannerParser implements ParserInterface
 				task.type = "PUT";
 			}
 
-			task_list.add(task);
+			// Added a filter for tasks without chunks.
+			// These can't be paired with anything anyway, but 
+			// the BlackPearl can re-aggregate jobs after they are
+			// queued. There doesn't appear to be a clear, job reaggrated
+			// message to parse for, so this filter aims to catch those
+			// hanging jobs while leaving active jobs in the list.
+
+			if(task.chunk_id != null)
+			{
+				task_list.add(task);
+			}
+			else
+			{
+				System.err.println("Dropping: " + task.id);
+			}
 		}
 
 		return task_list;

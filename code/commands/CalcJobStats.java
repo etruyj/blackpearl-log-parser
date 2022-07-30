@@ -7,13 +7,16 @@
 package com.socialvagrancy.blackpearl.logs.commands;
 
 import com.socialvagrancy.blackpearl.logs.structures.CompletedJob;
+import com.socialvagrancy.blackpearl.logs.structures.operations.DS3Operation;
 import com.socialvagrancy.blackpearl.logs.structures.operations.PoolOperation;
 import com.socialvagrancy.blackpearl.logs.structures.operations.TapeOperation;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetCompletedJobs;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetJobIDtoChunkMap;
+import com.socialvagrancy.blackpearl.logs.utils.linkers.GenerateDS3Operations;
 import com.socialvagrancy.blackpearl.logs.utils.linkers.GeneratePoolOperations;
 import com.socialvagrancy.blackpearl.logs.utils.linkers.GenerateTapeOperations;
+import com.socialvagrancy.blackpearl.logs.utils.linkers.LinkJobToDS3Operations;
 import com.socialvagrancy.blackpearl.logs.utils.linkers.LinkJobToPoolOperations;
 import com.socialvagrancy.blackpearl.logs.utils.linkers.LinkJobToTapeOperations;
 import com.socialvagrancy.blackpearl.logs.utils.linkers.MapTapeOperationsToChunk;
@@ -36,10 +39,12 @@ public class CalcJobStats
 		CompletedJob jobs = GetCompletedJobs.fromJson(dir_path + jobs_path);
 		ArrayList<TapeOperation> ops_list = GenerateTapeOperations.fromLogs(dir_path, 8, 14, log, debugging);
 		ArrayList<PoolOperation> pool_ops_list = GeneratePoolOperations.fromLogs(dir_path, 8, log, debugging);
+		ArrayList<DS3Operation> ds3_ops_list = GenerateDS3Operations.fromLogs(dir_path, 8, log, debugging);
 		HashMap<String, ArrayList<String>> id_chunk_map = GetJobIDtoChunkMap.fromDataplanner(dir_path, 8, log, debugging); 
 		// HashMap<String, ArrayList<TapeOperation>> ops_map = MapTapeOperationsToChunk.createMap(ops_list);
 		ArrayList<JobDetails> details_list = LinkJobToTapeOperations.createDetails(jobs, id_chunk_map, ops_list);
 		details_list = LinkJobToPoolOperations.addPools(details_list, id_chunk_map, pool_ops_list);
+		details_list = LinkJobToDS3Operations.addDS3(details_list, id_chunk_map, ds3_ops_list);
 
 		testPrint(details_list);
 
@@ -112,6 +117,32 @@ public class CalcJobStats
 					System.out.print(details_list.get(i).pool_copies.get(chunk).get(k).size + ",");
 					System.out.println(details_list.get(i).pool_copies.get(chunk).get(k).throughput);
 
+				}
+
+				// DS3 Copies
+
+				for(int l=0; l < details_list.get(i).ds3CopyCount(chunk); l++)
+				{
+				
+					System.out.print(details_list.get(i).job_info.name + ",");
+					System.out.print(details_list.get(i).job_info.request_type + ",");
+					System.out.print(details_list.get(i).job_info.created_at + ",");
+					System.out.print(details_list.get(i).job_info.date_completed + ",");
+					System.out.print(chunk + ",");
+					System.out.print("DS3 Copy " + l + ",");
+
+					System.out.print(details_list.get(i).ds3_copies.get(chunk).get(l).id + ",");
+					System.out.print(details_list.get(i).ds3_copies.get(chunk).get(l).target_name + ",");
+					System.out.print(","); // barcode field [skip]
+					System.out.print(details_list.get(i).ds3_copies.get(chunk).get(l).created_at + ",");
+					System.out.print(details_list.get(i).ds3_copies.get(chunk).get(l).date_completed + ",");
+					System.out.print(","); // Already in drive
+					System.out.print(","); // Mount start
+					System.out.print(","); // mount end
+					System.out.print(","); // rw_start
+					System.out.print(","); // rw_end
+					System.out.print(","); // size
+					System.out.print("\n"); // throughput
 				}
 			}
 		}

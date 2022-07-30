@@ -10,6 +10,7 @@ package com.socialvagrancy.blackpearl.logs.utils.linkers;
 import com.socialvagrancy.blackpearl.logs.structures.operations.PoolOperation;
 import com.socialvagrancy.blackpearl.logs.structures.rest.Pools;
 import com.socialvagrancy.blackpearl.logs.structures.Task;
+import com.socialvagrancy.blackpearl.logs.utils.BPLogDateConverter;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetPoolData;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetPoolTasks;
 import com.socialvagrancy.utils.Logger;
@@ -43,8 +44,8 @@ public class GeneratePoolOperations
 
 				op.task_id = task_list.get(i).id;
 				op.task_type = task_list.get(i).type;
-				op.created_at = task_list.get(i).sd_copy.get(j).created_at;
-				op.date_completed = task_list.get(i).sd_copy.get(j).date_completed;
+				op.created_at = BPLogDateConverter.formatDataPlannerTimestamp(task_list.get(i).sd_copy.get(j).created_at);
+				op.date_completed = BPLogDateConverter.formatDataPlannerTimestamp(task_list.get(i).sd_copy.get(j).date_completed);
 				op.chunks = task_list.get(i).chunk_id;
 				op.pool_id = task_list.get(i).sd_copy.get(j).target_id;
 				op.pool_name = task_list.get(i).sd_copy.get(j).target;
