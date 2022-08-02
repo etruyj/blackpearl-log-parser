@@ -20,6 +20,9 @@ public class BPLogParser
 				break;
 			case "job-status":
 				break;
+			case "system-info":
+				Controller.systemInfo(path);
+				break;
 			case "-h":
 			case "--help":
 				Display.fromFile("../lib/help/options.txt");

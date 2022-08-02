@@ -1,0 +1,13 @@
+
+BlackPearl Log Parser
+	This script parses BlackPearl logs in order to present the information in a coherent format for distributiona and review.
+
+	At this stage of development, please copy the /rest/gui_ds3_completed_jobs.json, /log/var.log.dataplanner-main.log and the /log/var.log.tape_backend.log from the BlackPearl's log set to a directory within this scripts main folder called "logs" for parsing.
+
+Options:
+	--help/-h	Displays this help file.
+	--version	Displays the version of this script
+
+Commands:
+	job-statistics	Exports a detailed informational breakdown of all the completed jobs that are contained in the log sets. Output format is CSV to shell. Copy to a file with > file_name.txt
+	system-info	Prints system hostname, serial number, and firmware version..
