@@ -132,10 +132,11 @@ public abstract class DataplannerParser implements ParserInterface
 			{
 				task_list.add(task);
 			}
-			else
-			{
-				System.err.println("Dropping: " + task.id);
-			}
+			// Not sure if I should track this or not.
+			//else
+			//{
+			//	log.INFO("Dropping (" + task.id + ") as no chunks were found for the task.");
+			//}
 		}
 
 		return task_list;

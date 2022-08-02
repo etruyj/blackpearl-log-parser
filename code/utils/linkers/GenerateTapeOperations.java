@@ -44,6 +44,36 @@ public class GenerateTapeOperations
 		return ops_list;
 	}
 
+	//=======================================
+	// Private Functions
+	//=======================================
+
+	private static TapeJob checkIfJobStarted(TreeMap<LocalDateTime, TapeJob> job_map, LocalDateTime checkTime)
+	{
+		// Catch if the TapeJob exists even if the TapeTask has not been completed.
+		// The job_map.lowerKey() fuction fails if the TapeTask has not be completed.
+		// This will check to see if there is a tape task that started after the Task's
+		// start time. This check will catch started, but not completed tape jobs
+		// as well as completed jobs. If the job doesn't exist, a new job with Jan 1, 2001
+		// is generated for tracking purposes.
+
+		TapeJob job;
+		LocalDateTime job_time = job_map.higherKey(checkTime);
+	
+		if(job_time != null)
+		{
+			job = job_map.get(checkTime);
+			return job;
+		}
+		else
+		{
+			job = new TapeJob();
+			job.start_time = "Jan 01 00:00:01";
+		       	job.end_time ="Jan 01 00:00:01"; 	
+			return job;
+		}
+	}
+
 	private static ArrayList<TapeOperation> populateTapeExchanges(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, Logger log, boolean debugging)
 	{
 		int exch_counter = 0;
@@ -87,8 +117,8 @@ public class GenerateTapeOperations
 				// Set mount time to a pre-blackpearl era
 				// This gives us a value for doing other tasks and lets us mark the exchange
 				// as occuring before the task was created, i.e. the drive was already loaded.
-				mount_time = LocalDateTime.parse("2000 JAN 01 00:00:01", final_format);
-				eject_time = LocalDateTime.parse("2000 JAN 01 00:00:01", final_format);
+				mount_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
+				eject_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
 			}
 			else
 			{
@@ -116,7 +146,7 @@ public class GenerateTapeOperations
 			}
 			else
 			{
-				ops_list.get(i).already_in_drive = false;
+				ops_list.get(i).already_in_drive = true;
 			       	ops_list.get(i).mount_start = "2000 JAN 01 00:00:01";
 				ops_list.get(i).mount_end = "2000 JAN 01 00:00:01";
 			}
@@ -149,17 +179,36 @@ public class GenerateTapeOperations
 
 			test_time = end_time;
 
+			// Check to see if the end-time is set to blank: "2001 Jan 01 00:00:01"
+			// If so, set it to now to allow the do-while loop to exit.
+			if(end_time.isBefore(LocalDateTime.of(2007, 01, 01, 00, 00, 01)))
+			{
+				end_time = LocalDateTime.now();
+			}
+
 			do
 			{
-				// Find the job time that occured for the ops_list.drive_wwn 
-				// just before the test time.
-				job_time = job_map.get(ops_list.get(i).drive_wwn).lowerKey(test_time);
+				try
+				{
+					// Find the job time that occured for the ops_list.drive_wwn 
+					// just before the test time.
+					job_time = job_map.get(ops_list.get(i).drive_wwn).lowerKey(test_time);
 				
-				System.err.println(ops_list.get(i).id + " " + ops_list.get(i).task_created + " " + ops_list.get(i).task_completed);
 
-				// Store the job that occured at that time.
-				job = job_map.get(ops_list.get(i).drive_wwn).get(job_time);
-				
+					// Store the job that occured at that time.
+					job = job_map.get(ops_list.get(i).drive_wwn).get(job_time);
+				}
+				catch(Exception e)
+				{
+					// Catch to see if the TapeJob started even though the TapeTask
+					// has not completed.
+					job = checkIfJobStarted(job_map.get(ops_list.get(i).drive_wwn), start_time);
+					
+					time_converter = BPLogDateConverter.formatTapeBackendTimestamp(job.start_time);
+
+					job_time = LocalDateTime.parse(time_converter, final_format);
+				}
+
 				time_converter = BPLogDateConverter.formatTapeBackendTimestamp(job.end_time);
 				job_end_time = LocalDateTime.parse(time_converter, final_format);
 

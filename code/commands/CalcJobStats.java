@@ -30,21 +30,16 @@ public class CalcJobStats
 	public static ArrayList<JobDetails> forCompletedJobs(String dir_path, Logger log)
 	{
 		boolean debugging = false;
-		log = new Logger("../logs/bp_logs.log", 1024, 1, 1);
-		/* MARK FOR DELETION
-		 * 	OLD FUNCTION
-		 * GenerateCompletedJobInfo.createJobStats(dir_path, 8, 14, log);
-		*/
+		log = new Logger("../logs/bp_logs.log", 102400, 5, 1);
 		String jobs_path = "rest/gui_ds3_completed_jobs.json";
 		CompletedJob jobs = GetCompletedJobs.fromJson(dir_path + jobs_path);
 		ArrayList<TapeOperation> ops_list = GenerateTapeOperations.fromLogs(dir_path, 8, 14, log, debugging);
 		ArrayList<PoolOperation> pool_ops_list = GeneratePoolOperations.fromLogs(dir_path, 8, log, debugging);
 		ArrayList<DS3Operation> ds3_ops_list = GenerateDS3Operations.fromLogs(dir_path, 8, log, debugging);
 		HashMap<String, ArrayList<String>> id_chunk_map = GetJobIDtoChunkMap.fromDataplanner(dir_path, 8, log, debugging); 
-		// HashMap<String, ArrayList<TapeOperation>> ops_map = MapTapeOperationsToChunk.createMap(ops_list);
-		ArrayList<JobDetails> details_list = LinkJobToTapeOperations.createDetails(jobs, id_chunk_map, ops_list);
-		details_list = LinkJobToPoolOperations.addPools(details_list, id_chunk_map, pool_ops_list);
-		details_list = LinkJobToDS3Operations.addDS3(details_list, id_chunk_map, ds3_ops_list);
+		ArrayList<JobDetails> details_list = LinkJobToTapeOperations.createDetails(jobs, id_chunk_map, ops_list, log);
+		details_list = LinkJobToPoolOperations.addPools(details_list, id_chunk_map, pool_ops_list, log);
+		details_list = LinkJobToDS3Operations.addDS3(details_list, id_chunk_map, ds3_ops_list, log);
 
 		testPrint(details_list);
 
