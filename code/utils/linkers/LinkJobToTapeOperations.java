@@ -9,7 +9,9 @@ package com.socialvagrancy.blackpearl.logs.utils.linkers;
 import com.socialvagrancy.blackpearl.logs.structures.CompletedJob;
 import com.socialvagrancy.blackpearl.logs.structures.operations.TapeOperation;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
+import com.socialvagrancy.blackpearl.logs.utils.BPLogDateConverter;
 import com.socialvagrancy.utils.Logger;
+import com.socialvagrancy.utils.storage.UnitConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +37,12 @@ public class LinkJobToTapeOperations
 			details = new JobDetails();
 			details.job_info = jobs.data[i];
 			
+			details.job_info.created_at = BPLogDateConverter.formatCompletedJobsTimestamp(details.job_info.created_at);
+			details.job_info.date_completed = BPLogDateConverter.formatCompletedJobsTimestamp(details.job_info.date_completed);
+
+			details.job_duration = BPLogDateConverter.calcDuration(details.job_info.created_at, details.job_info.date_completed);
+
+			details.human_readable_size = UnitConverter.bytesToHumanReadable(details.job_info.original_size_in_bytes);
 
 			chunks = chunk_id_map.get(details.job_info.id);
 

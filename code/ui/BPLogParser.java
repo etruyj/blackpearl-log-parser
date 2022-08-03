@@ -10,8 +10,7 @@ public class BPLogParser
 		switch(command)
 		{
 			case "completed-job-details":
-			case "job-stats":
-				Controller.jobStatistics(path);
+				Controller.completedJobDetails(path);
 				break;
 			case "completed-job-statistics":
 			case "completed-job-stats":

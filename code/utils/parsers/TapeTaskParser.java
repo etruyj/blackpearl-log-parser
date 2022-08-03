@@ -177,12 +177,6 @@ public class TapeTaskParser extends DataplannerParser
 			task.type = "skip";
 		}
 	
-
-		if(task.id.equals("WriteChunkToTapeTask#295"))
-		{
-			System.err.println("Task check: " + task.sd_copy.get(task.copies).created_at + " " + task.sd_copy.get(task.copies).date_completed);
-		}
-
 		return task;
 	}
 

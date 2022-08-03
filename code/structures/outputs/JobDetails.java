@@ -22,6 +22,13 @@ public class JobDetails
 	public HashMap<String, ArrayList<PoolOperation>> pool_copies;
 	public HashMap<String, ArrayList<DS3Operation>> ds3_copies;
 
+	//=======================================
+	// Calculated job values.
+	//=======================================
+
+	public String human_readable_size;
+	public String job_duration;
+
 	public JobDetails()
 	{
 		tape_copies = new HashMap<String, ArrayList<TapeOperation>>();
