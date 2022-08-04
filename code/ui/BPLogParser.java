@@ -19,6 +19,9 @@ public class BPLogParser
 				break;
 			case "job-status":
 				break;
+			case "list-buckets":
+				Controller.listBuckets(path);
+				break;
 			case "system-info":
 				Controller.systemInfo(path);
 				break;

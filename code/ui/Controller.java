@@ -9,6 +9,7 @@ package com.socialvagrancy.blackpearl.logs.ui;
 import com.socialvagrancy.blackpearl.logs.commands.CalcJobStats;
 import com.socialvagrancy.blackpearl.logs.commands.GatherCompletedJobDetails;
 import com.socialvagrancy.blackpearl.logs.commands.GetSystemInfo;
+import com.socialvagrancy.blackpearl.logs.commands.ListBuckets;
 import com.socialvagrancy.blackpearl.logs.structures.JobStatistics;
 
 import java.util.ArrayList;
@@ -28,6 +29,11 @@ public class Controller
 	public static void completedJobDetails(String path)
 	{
 		GatherCompletedJobDetails.forCompletedJobs(path, null);
+	}
+
+	public static void listBuckets(String path)
+	{
+		ListBuckets.fromRest(path);
 	}
 
 	public static void systemInfo(String path)
