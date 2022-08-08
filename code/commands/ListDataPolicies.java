@@ -28,9 +28,6 @@ public class ListDataPolicies
 		ArrayList<StorageDomain> domain_list = ListStorageDomains.fromRest(dir_path);
 		ArrayList<DataPolicy> policy_list = GenerateDataPolicy.fromRest(policies, dp_to_sd_id_map, domain_list);
 		
-
-		testPrint(policy_list);
-		
 		return policy_list;
 	}
 

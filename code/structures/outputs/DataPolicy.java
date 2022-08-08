@@ -24,7 +24,9 @@ public class DataPolicy
 	//=======================================
 	// Functions
 	//=======================================
-	
+
+	public String getID() { return id; }
+
 	public int getStorageDomainCount()
 	{
 		return domains_list.size();

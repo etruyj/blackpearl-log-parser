@@ -23,8 +23,6 @@ public class ListStorageDomains
 		GuiStorageDomainMembers members = GetStorageDomainMembers.fromJson(dir_path + "/rest/gui_ds3_storage_domain_members.json");
 		ArrayList<StorageDomain> domain_list = GenerateStorageDomains.createList(domains, members);
 
-		testPrint(domain_list);
-
 		return domain_list;
 	}
 

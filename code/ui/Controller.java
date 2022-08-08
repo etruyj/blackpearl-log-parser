@@ -12,22 +12,14 @@ import com.socialvagrancy.blackpearl.logs.commands.GetSystemInfo;
 import com.socialvagrancy.blackpearl.logs.commands.ListBuckets;
 import com.socialvagrancy.blackpearl.logs.commands.ListDataPolicies;
 import com.socialvagrancy.blackpearl.logs.commands.ListStorageDomains;
-import com.socialvagrancy.blackpearl.logs.structures.JobStatistics;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
 
 import java.util.ArrayList;
 
 public class Controller
 {
-	public static ArrayList<JobStatistics> jobStatistics(String path)
-	{
-		CalcJobStats.forCompletedJobs(path, null);
-	//	ArrayList<JobStatistics> stat_list = CalcJobStats.fromCompletedJobs(path, null);
-		
-	//	CalcJobStatistics.print(stat_list);
-
-		return null;
-	}
-
 	public static void completedJobDetails(String path)
 	{
 		GatherCompletedJobDetails.forCompletedJobs(path, null);
@@ -35,17 +27,20 @@ public class Controller
 
 	public static void listBuckets(String path)
 	{
-		ListBuckets.fromRest(path);
+		ArrayList<Bucket> bucket_list = ListBuckets.fromRest(path);
+		ListBuckets.testPrint(bucket_list);
 	}
 
 	public static void listDataPolicies(String path)
 	{
-		ListDataPolicies.fromRest(path);
+		ArrayList<DataPolicy> policy_list = ListDataPolicies.fromRest(path);
+		ListDataPolicies.testPrint(policy_list);
 	}
 
 	public static void listStorageDomains(String path)
 	{
-		ListStorageDomains.fromRest(path);
+		ArrayList<StorageDomain> domain_list = ListStorageDomains.fromRest(path);
+		ListStorageDomains.testPrint(domain_list);
 	}
 
 	public static void systemInfo(String path)

@@ -8,29 +8,37 @@ package com.socialvagrancy.blackpearl.logs.commands;
 
 import com.socialvagrancy.blackpearl.logs.structures.rest.GuiBucket;
 import com.socialvagrancy.blackpearl.logs.utils.importers.rest.GetBuckets;
+import com.socialvagrancy.blackpearl.logs.utils.linkers.GenerateBuckets;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.utils.storage.UnitConverter;
 
+
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 public class ListBuckets
 {
-	public static GuiBucket fromRest(String dir_path)
+	public static ArrayList<Bucket> fromRest(String dir_path)
 	{
 		String path = dir_path + "/rest/gui_ds3_buckets.json";
 		GuiBucket buckets = GetBuckets.fromJson(path);
-		
-		testPrint(buckets);
+		ArrayList<DataPolicy> policy_list = ListDataPolicies.fromRest(dir_path);
+		ArrayList<Bucket> bucket_list = GenerateBuckets.fromRest(buckets, policy_list);
 
-		return buckets;
+		return bucket_list;
 	}
 
-	public static void testPrint(GuiBucket buckets)
+	public static void testPrint(ArrayList<Bucket> bucket_list)
 	{
-		for(int i=0; i<buckets.bucketCount(); i++)
+		System.out.println("bucket_name,data_policy,owner,size,data_copies");
+		for(int i=0; i<bucket_list.size(); i++)
 		{
-			System.out.println(buckets.getName(i) + "\t"
-					+ buckets.getOwner(i) + "\t"
-					+ UnitConverter.bytesToHumanReadable(buckets.getSize(i)));
+			System.out.println(bucket_list.get(i).name + ","
+					+ bucket_list.get(i).dataPolicy() + ","
+					+ bucket_list.get(i).owner + ","
+					+ bucket_list.get(i).size_human + "," 
+					+ bucket_list.get(i).copyCount());
 		}
 	}
 }

@@ -28,7 +28,8 @@ public class GuiBucket
 			return data.length;
 		}	
 	}
-	public String getDataPolicy(int bucket) { return data[bucket].data_policy_id; }
+	public String getDataPolicyID(int bucket) { return data[bucket].data_policy_id; }
+	public String getID(int bucket) { return data[bucket].id; }
 	public String getName(int bucket) { return data[bucket].name; }
 	public String getOwner(int bucket) { return data[bucket].user_username; }
 	public BigInteger getSize(int bucket) { return data[bucket].logical_used_capacity; }
