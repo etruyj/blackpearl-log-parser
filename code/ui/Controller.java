@@ -10,6 +10,7 @@ import com.socialvagrancy.blackpearl.logs.commands.CalcJobStats;
 import com.socialvagrancy.blackpearl.logs.commands.GatherCompletedJobDetails;
 import com.socialvagrancy.blackpearl.logs.commands.GetSystemInfo;
 import com.socialvagrancy.blackpearl.logs.commands.ListBuckets;
+import com.socialvagrancy.blackpearl.logs.commands.ListDataPolicies;
 import com.socialvagrancy.blackpearl.logs.commands.ListStorageDomains;
 import com.socialvagrancy.blackpearl.logs.structures.JobStatistics;
 
@@ -35,6 +36,11 @@ public class Controller
 	public static void listBuckets(String path)
 	{
 		ListBuckets.fromRest(path);
+	}
+
+	public static void listDataPolicies(String path)
+	{
+		ListDataPolicies.fromRest(path);
 	}
 
 	public static void listStorageDomains(String path)

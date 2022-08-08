@@ -22,6 +22,9 @@ public class BPLogParser
 			case "list-buckets":
 				Controller.listBuckets(path);
 				break;
+			case "list-data-policies":
+				Controller.listDataPolicies(path);
+				break;
 			case "list-storage-domains":
 				Controller.listStorageDomains(path);
 				break;

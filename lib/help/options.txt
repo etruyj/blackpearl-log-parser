@@ -11,5 +11,6 @@ Options:
 Commands:
 	completed-job-details	Exports a detailed informational breakdown of all the completed jobs that are contained in the log sets. Output format is CSV to shell. Copy to a file with > file_name.txt
 	list-buckets		Prints a list of buckets, owners, and human readable sizes.
+	list-data-policies	Prints a list of data policies and their associated storage domains.	
 	list-storage-domains	Prints a list of storage domains.
 	system-info		Prints system hostname, serial number, and firmware version..
