@@ -22,7 +22,9 @@ public class Bucket
 	//=======================================
 	
 	public void attachPolicy(DataPolicy policy) { data_policy = policy; }
-	public int copyCount() { return data_policy.getStorageDomainCount(); }
+	public int copyCount() { return data_policy.dataCopies(); }
+	public int localCopies() { return data_policy.getStorageDomainCount(); }
+	public int remoteCopies() { return data_policy.replicationRuleCount(); }
 	public String dataPolicy() { return data_policy.name; }
 }
 

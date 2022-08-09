@@ -27,4 +27,16 @@ public class MapDataPolicyToID
 
 		return policy_map;
 	}
+
+	public static HashMap<String, Integer> createIndexMap(ArrayList<DataPolicy> policy_list)
+	{
+		HashMap<String, Integer> policy_map = new HashMap<String, Integer>();
+
+		for(int i=0; i<policy_list.size(); i++)
+		{
+			policy_map.put(policy_list.get(i).getID(), i);
+		}
+
+		return policy_map;
+	}
 }

@@ -31,14 +31,16 @@ public class ListBuckets
 
 	public static void testPrint(ArrayList<Bucket> bucket_list)
 	{
-		System.out.println("bucket_name,data_policy,owner,size,data_copies");
+		System.out.println("bucket_name,data_policy,owner,size,data_copies, local_copies, replicated_copies");
 		for(int i=0; i<bucket_list.size(); i++)
 		{
 			System.out.println(bucket_list.get(i).name + ","
 					+ bucket_list.get(i).dataPolicy() + ","
 					+ bucket_list.get(i).owner + ","
 					+ bucket_list.get(i).size_human + "," 
-					+ bucket_list.get(i).copyCount());
+					+ bucket_list.get(i).copyCount() + ","
+					+ bucket_list.get(i).localCopies() + ","
+					+ bucket_list.get(i).remoteCopies());
 		}
 	}
 }
