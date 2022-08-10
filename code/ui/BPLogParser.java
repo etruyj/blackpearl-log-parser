@@ -12,13 +12,6 @@ public class BPLogParser
 			case "completed-job-details":
 				Controller.completedJobDetails(path);
 				break;
-			case "completed-job-statistics":
-			case "completed-job-stats":
-				break;
-			case "completed-job-summary":
-				break;
-			case "job-status":
-				break;
 			case "list-buckets":
 				Controller.listBuckets(path);
 				break;
