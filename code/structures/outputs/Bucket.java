@@ -26,5 +26,7 @@ public class Bucket
 	public int localCopies() { return data_policy.getStorageDomainCount(); }
 	public int remoteCopies() { return data_policy.replicationRuleCount(); }
 	public String dataPolicy() { return data_policy.name; }
+	public String id() { return id; }
 }
+
 

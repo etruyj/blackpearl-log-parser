@@ -9,16 +9,26 @@ public class BPLogParser
 	{
 		switch(command)
 		{
+			case "active-job-details":
+				Controller.activeJobDetails(path);
+				break;
+			case "active-job-status":
+			case "job-status":
+				Controller.activeJobStatus(path);
+				break;
 			case "completed-job-details":
+			case "job-details":
 				Controller.completedJobDetails(path);
 				break;
 			case "list-buckets":
 				Controller.listBuckets(path);
 				break;
 			case "list-data-policies":
+			case "list-policies":
 				Controller.listDataPolicies(path);
 				break;
 			case "list-storage-domains":
+			case "list-domains":
 				Controller.listStorageDomains(path);
 				break;
 			case "system-info":

@@ -40,6 +40,16 @@ public class JobDetails
 	// Getters
 	//=======================================
 
+	public String bucketID() { return job_info.bucket_id; }
+	public String cachedSize() { return job_info.cached_size_in_bytes; }
+	public String completedSize() { return job_info.completed_size_in_bytes; }
+	public String createdAt() { return job_info.created_at; }
+	public String id() { return job_info.id; }
+	public String originalSize() { return job_info.original_size_in_bytes; }
+	public String owner() { return job_info.user_username; }
+	public String name() { return job_info.name; }
+	public String type() { return job_info.request_type; }
+
 	public int tapeCopyCount(String chunk) 
 	{
 	       	if(tape_copies.get(chunk) == null)

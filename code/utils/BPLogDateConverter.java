@@ -60,6 +60,12 @@ public class BPLogDateConverter
 	{
 		DateTimeFormatter in_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		// Check to see if the timestamp is null
+		if(timestamp == null)
+		{
+			timestamp = "2001-01-01T00:00:01.00";
+		}
+	
 		// Clean the JSON output to something LocalDateTime can parse.
 		timestamp = timestamp.replace("T", " ");
 		String[] cleaned_time = timestamp.split("\\.");

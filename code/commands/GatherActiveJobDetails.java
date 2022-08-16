@@ -31,13 +31,13 @@ import com.socialvagrancy.utils.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GatherCompletedJobDetails
+public class GatherActiveJobDetails
 {
-	public static ArrayList<JobDetails> forCompletedJobs(String dir_path, Logger log)
+	public static ArrayList<JobDetails> fromLogs(String dir_path, Logger log)
 	{
 		boolean debugging = false;
 		log = new Logger("../logs/bp_logs.log", 102400, 5, 1);
-		String jobs_path = "rest/gui_ds3_completed_jobs.json";
+		String jobs_path = "rest/gui_ds3_active_jobs.json";
 		CompletedJob jobs = GetCompletedJobs.fromJson(dir_path + jobs_path);
 		ArrayList<TapeOperation> ops_list = GenerateTapeOperations.fromLogs(dir_path, 8, 14, log, debugging);
 		ArrayList<PoolOperation> pool_ops_list = GeneratePoolOperations.fromLogs(dir_path, 8, log, debugging);

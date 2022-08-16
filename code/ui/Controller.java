@@ -6,12 +6,15 @@
 
 package com.socialvagrancy.blackpearl.logs.ui;
 
+import com.socialvagrancy.blackpearl.logs.commands.ActiveJobStatus;
 import com.socialvagrancy.blackpearl.logs.commands.CalcJobStats;
+import com.socialvagrancy.blackpearl.logs.commands.GatherActiveJobDetails;
 import com.socialvagrancy.blackpearl.logs.commands.GatherCompletedJobDetails;
 import com.socialvagrancy.blackpearl.logs.commands.GetSystemInfo;
 import com.socialvagrancy.blackpearl.logs.commands.ListBuckets;
 import com.socialvagrancy.blackpearl.logs.commands.ListDataPolicies;
 import com.socialvagrancy.blackpearl.logs.commands.ListStorageDomains;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.ActiveJob;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
@@ -20,6 +23,17 @@ import java.util.ArrayList;
 
 public class Controller
 {
+	public static void activeJobDetails(String path)
+	{
+		GatherActiveJobDetails.fromLogs(path, null);
+	}
+
+	public static void activeJobStatus(String path)
+	{
+		ArrayList<ActiveJob> job_list = ActiveJobStatus.fromRest(path);
+		ActiveJobStatus.testPrint(job_list);
+	}
+
 	public static void completedJobDetails(String path)
 	{
 		GatherCompletedJobDetails.forCompletedJobs(path, null);
