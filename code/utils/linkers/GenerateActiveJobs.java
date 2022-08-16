@@ -136,10 +136,10 @@ public class GenerateActiveJobs
 			}
 			else // it's a GET
 			{
-				// Copies = restore to cache + restore to client
+				// Copies = restore to cache
 				// this doesn't factor in restore from pool,
 				// which skips the cache.
-				copies = 2;
+				copies = 1;
 			}
 		}
 		else
