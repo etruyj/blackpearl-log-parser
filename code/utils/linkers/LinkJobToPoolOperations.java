@@ -57,7 +57,7 @@ public class LinkJobToPoolOperations
 
 		System.err.println("Job Size: " + details_list.size() + "\t" + "Chunk count: " + chunk_count);
 		System.err.println("Jobs without pool copies: " + no_pool_job_count);
-		System.err.println("\n");
+		System.err.print("\n"); // Add a space between this and the next output.
 
 		return details_list;
 	}

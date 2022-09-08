@@ -34,11 +34,16 @@ public class StorageDomain
 
 	public String getID() { return id; }
 	public int getMemberCount() { return members.size(); }
+	public String getMemberName(int id) { return members.get(id).member_name; }
 	public String getName() { return name; }
 	public String getWriteOptimization() { return write_optimization; }
 
 	public String getMemberType(int id)
 	{
+		return members.get(id).getType(); 
+
+		/*
+		 * MARK FOR DELETION
 		if(members.get(id).pool_partition_id == null)
 		{
 			return "tape";
@@ -49,6 +54,7 @@ public class StorageDomain
 		}
 
 		return "none listed";
+		*/
 	}
 
 	public String getState(int id)

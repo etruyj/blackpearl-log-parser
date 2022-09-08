@@ -11,7 +11,7 @@ import com.socialvagrancy.blackpearl.logs.structures.operations.PoolOperation;
 import com.socialvagrancy.blackpearl.logs.structures.rest.Pools;
 import com.socialvagrancy.blackpearl.logs.structures.Task;
 import com.socialvagrancy.blackpearl.logs.utils.BPLogDateConverter;
-import com.socialvagrancy.blackpearl.logs.utils.importers.GetPoolData;
+import com.socialvagrancy.blackpearl.logs.utils.importers.rest.GetPoolData;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetPoolTasks;
 import com.socialvagrancy.utils.Logger;
 

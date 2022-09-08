@@ -44,8 +44,6 @@ public class ActiveJobStatus
 
 		ArrayList<Bucket> bucket_list = ListBuckets.fromRest(dir_path);
 		
-		System.out.println("Jobs: " + jobs.jobCount());
-
 		ArrayList<ActiveJob> job_list = GenerateActiveJobs.fromLogset(details_list, bucket_list, id_chunk_map);
 
 		return job_list;

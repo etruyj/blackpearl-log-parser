@@ -4,7 +4,7 @@
 // 		Import the pool data from the rest/pools.json
 //===================================================================
 
-package com.socialvagrancy.blackpearl.logs.utils.importers;
+package com.socialvagrancy.blackpearl.logs.utils.importers.rest;
 
 import com.socialvagrancy.blackpearl.logs.structures.rest.Pools;
 import com.socialvagrancy.blackpearl.logs.utils.inputs.LoadFile;

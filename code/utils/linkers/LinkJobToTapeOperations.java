@@ -27,8 +27,8 @@ public class LinkJobToTapeOperations
 		int dropped_job_count = 0;
 
 
-		System.err.print("\n\n");
-		System.err.println("Job count: " + jobs.data.length);
+		System.err.print("\n");
+		System.err.println("Job Count: " + jobs.data.length);
 		System.err.println("Chunk/ID Map size: " + chunk_id_map.size());
 		System.err.println("Chunk/Ops Map size: " + chunk_op_map.size());
 		

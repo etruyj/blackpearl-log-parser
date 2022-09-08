@@ -19,4 +19,24 @@ public class StorageDomainMember
 	public String created_at;
 	public String updated_at;
 	public String id;
+
+	// Not included in the json, but added for
+	// human-readability.
+	public String member_name;
+
+	//=======================================
+	// FUNCTIONS
+	//=======================================
+
+	public String getType()
+	{
+		if(pool_partition_id == null)
+		{
+			return "tape";
+		}
+		else
+		{
+			return "pool";
+		}
+	}	
 }

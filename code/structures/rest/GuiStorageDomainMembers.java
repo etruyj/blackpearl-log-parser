@@ -33,8 +33,22 @@ public class GuiStorageDomainMembers
 		return data[member];
 	}
 
+	public String getMemberID(int member) 
+	{
+	       	if(getMemberType(member).equals("pool"))
+		{	
+			return data[member].pool_partition_id;
+		}
+		else
+		{
+			return data[member].tape_partition_id;
+		}	
+	}
+
+	public String getMemberType(int member) { return data[member].getType(); }
 	public String getStorageDomainID(int member) { return data[member].storage_domain_id; }
 	public String getWritePreference(int member) { return data[member].write_preference; }
 	public String getTapeType(int member) { return data[member].tape_type; }
 
+	public void setMemberName(int member, String name) { data[member].member_name = name; }
 }
