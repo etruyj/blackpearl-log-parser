@@ -22,8 +22,8 @@ public class LinkJobToDS3Operations
 		ArrayList<String> chunks;
 		int no_ds3_copy_count = 0;
 
-		System.err.println("DS3 list size: " + ops_list.size());
-		System.err.println("DS3 map size: " + ops_map.size());
+		System.err.println("DS3 List Size: " + ops_list.size());
+		System.err.println("DS3 Map Size: " + ops_map.size());
 
 		for(int i=0; i < details_list.size(); i++)
 		{
@@ -47,7 +47,7 @@ public class LinkJobToDS3Operations
 			}
 		}
 
-		System.err.println("Jobs without ds3 copies: " + no_ds3_copy_count);
+		System.err.println("Chunks Without DS3 Copies: " + no_ds3_copy_count);
 		System.err.print("\n");
 
 		return details_list;

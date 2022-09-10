@@ -1,11 +1,13 @@
 package com.socialvagrancy.blackpearl.logs.ui;
 
 import com.socialvagrancy.blackpearl.logs.ui.display.Display;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
+import java.util.ArrayList;
 
 public class BPLogParser
 {
 
-	public static void parseCommand(String command, String path)
+	public static void parseCommand(String command, String path, String output_format)
 	{
 		switch(command)
 		{
@@ -18,7 +20,8 @@ public class BPLogParser
 				break;
 			case "completed-job-details":
 			case "job-details":
-				Controller.completedJobDetails(path);
+				ArrayList<JobDetails> details_list = Controller.completedJobDetails(path);
+				Display.print(details_list, output_format);
 				break;
 			case "list-buckets":
 				Controller.listBuckets(path);
@@ -57,6 +60,6 @@ public class BPLogParser
 
 		//System.err.println(aparser.getPath());
 
-		BPLogParser.parseCommand(aparser.getCommand(), aparser.getPath());
+		BPLogParser.parseCommand(aparser.getCommand(), aparser.getPath(), "csv");
 	}
 }

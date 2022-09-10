@@ -13,6 +13,7 @@ import com.socialvagrancy.blackpearl.logs.structures.TapeActivity;
 import com.socialvagrancy.blackpearl.logs.structures.TapeExchange;
 import com.socialvagrancy.blackpearl.logs.structures.TapeJob;
 import com.socialvagrancy.blackpearl.logs.structures.Task;
+import com.socialvagrancy.blackpearl.logs.structures.rest.GuiTapeLibraryPartitions;
 import com.socialvagrancy.blackpearl.logs.structures.operations.TapeOperation;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetTapeExchanges;
 import com.socialvagrancy.blackpearl.logs.utils.importers.GetTapeJobs;
@@ -28,18 +29,20 @@ import java.util.TreeMap;
 
 public class GenerateTapeOperations
 {
+	private static DateTimeFormatter excel_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-	public static ArrayList<TapeOperation> fromLogs(String dir_path, int dataplanner_log_count, int tape_backend_log_count, Logger log, boolean debugging)
+	public static ArrayList<TapeOperation> fromLogs(String dir_path, int dataplanner_log_count, int tape_backend_log_count, GuiTapeLibraryPartitions tape_partitions, Logger log, boolean debugging)
 	{
 		// The dataplanner and tape_backend logs are stitched together.
 		// The dataplanner task completed (date_completed) timestamp is used to
 		// limit the tape job.
 		// Once the tape job is located. The exchange that put that tape in the drive
 		// can be determined.
+		HashMap<String, GuiTapeLibraryPartitions.TapePartition> sn_partition_map = MapTapePartitionToSN.createMap(tape_partitions);
 
 		ArrayList<TapeOperation> ops_list = populateTasks(dir_path, dataplanner_log_count, log, debugging);
 		ops_list = populateTapeJobs(ops_list, dir_path, tape_backend_log_count, log, debugging);
-		ops_list = populateTapeExchanges(ops_list, dir_path, tape_backend_log_count, log, debugging);
+		ops_list = populateTapeExchanges(ops_list, dir_path, tape_backend_log_count, sn_partition_map, log, debugging);
 
 		return ops_list;
 	}
@@ -74,9 +77,10 @@ public class GenerateTapeOperations
 		}
 	}
 
-	private static ArrayList<TapeOperation> populateTapeExchanges(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, Logger log, boolean debugging)
+	private static ArrayList<TapeOperation> populateTapeExchanges(ArrayList<TapeOperation> ops_list, String dir_path, int tape_backend_log_count, HashMap<String, GuiTapeLibraryPartitions.TapePartition> sn_partition_map, Logger log, boolean debugging)
 	{
 		int exch_counter = 0;
+		int drive; // drive_number calculations
 
 		ArrayList<TapeExchange> exch_list = GetTapeExchanges.fromTapeBackend(dir_path, tape_backend_log_count, log, debugging);
 		
@@ -85,7 +89,6 @@ public class GenerateTapeOperations
 		LocalDateTime data_start_time;
 		LocalDateTime mount_time;
 		LocalDateTime eject_time;
-		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 		TapeExchange exchange;
 
 		for(int i=0; i<ops_list.size(); i++)
@@ -93,8 +96,8 @@ public class GenerateTapeOperations
 			// Create datetime variables for the boundary times
 			//	This allows for searching the treemap for the closest timestamp
 			//	Using LocalDateTime as the date is already formatted.
-			start_time = LocalDateTime.parse(ops_list.get(i).task_created, final_format);	
-			data_start_time = LocalDateTime.parse(ops_list.get(i).rw_start_time, final_format);
+			start_time = LocalDateTime.parse(ops_list.get(i).task_created, excel_format);	
+			data_start_time = LocalDateTime.parse(ops_list.get(i).rw_start_time, excel_format);
 
 			// Subtract 1 second from start_time as it is possible a move will be queued the same second
 			// a job is created. This corrects an issue where tape exchanges queued immediately after the
@@ -117,8 +120,8 @@ public class GenerateTapeOperations
 				// Set mount time to a pre-blackpearl era
 				// This gives us a value for doing other tasks and lets us mark the exchange
 				// as occuring before the task was created, i.e. the drive was already loaded.
-				mount_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
-				eject_time = LocalDateTime.parse("2000 Jan 01 00:00:01", final_format);
+				mount_time = LocalDateTime.parse("2000-01-01 00:00:01", excel_format);
+				eject_time = LocalDateTime.parse("2000-01-01 00:00:01", excel_format);
 			}
 			else
 			{
@@ -129,12 +132,21 @@ public class GenerateTapeOperations
 			}
 
 			// Identify the drive number
-			/*
-			 * THIS WILL BE A FUNCTION CALL ADDED IN THE FUTURE
-			 * STACKS AND BOAS HAVE DIFFERENT CONVERSIONS
-			 */
+			if(Integer.valueOf(exchange.target) < 200)
+			{
+				// Stack Library
+				ops_list.get(i).drive_number = exchange.target;
+			}
+			else
+			{
+				drive = Integer.valueOf(exchange.target);
+				drive -= 255; // 256 is drive 1
+				ops_list.get(i).drive_number = String.valueOf(drive);
+			}	
 
 			ops_list.get(i).barcode = exchange.tape_barcode;
+			ops_list.get(i).partition_id = exchange.partition_id;
+			ops_list.get(i).partition_name = sn_partition_map.get(ops_list.get(i).partition_id).name;
 
 			if(mount_time.isAfter(start_time))
 			{
@@ -147,9 +159,12 @@ public class GenerateTapeOperations
 			else
 			{
 				ops_list.get(i).already_in_drive = true;
-			       	ops_list.get(i).mount_start = "2000 JAN 01 00:00:01";
-				ops_list.get(i).mount_end = "2000 JAN 01 00:00:01";
+			       	ops_list.get(i).mount_start = "2000-01-01 00:00:01";
+				ops_list.get(i).mount_end = "2000-01-01 00:00:01";
 			}
+			
+			// Calculate mount operation duration
+			ops_list.get(i).mount_duration = BPLogDateConverter.calcDuration(ops_list.get(i).mount_start, ops_list.get(i).mount_end);
 		}
 
 		return ops_list;
@@ -169,13 +184,14 @@ public class GenerateTapeOperations
 		LocalDateTime job_end_time;
 		LocalDateTime test_time;
 		String time_converter; // Holds the string value of the converted time.
-		DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		//MARK FOR DELETION
+		//DateTimeFormatter final_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 		TapeJob job;
 
 		for(int i=0; i<ops_list.size(); i++)
 		{
-			start_time = LocalDateTime.parse(ops_list.get(i).task_created, final_format);
-			end_time = LocalDateTime.parse(ops_list.get(i).task_completed, final_format);
+			start_time = LocalDateTime.parse(ops_list.get(i).task_created, excel_format);
+			end_time = LocalDateTime.parse(ops_list.get(i).task_completed, excel_format);
 
 			test_time = end_time;
 
@@ -206,11 +222,11 @@ public class GenerateTapeOperations
 					
 					time_converter = BPLogDateConverter.formatTapeBackendTimestamp(job.start_time);
 
-					job_time = LocalDateTime.parse(time_converter, final_format);
+					job_time = LocalDateTime.parse(time_converter, excel_format);
 				}
 
 				time_converter = BPLogDateConverter.formatTapeBackendTimestamp(job.end_time);
-				job_end_time = LocalDateTime.parse(time_converter, final_format);
+				job_end_time = LocalDateTime.parse(time_converter, excel_format);
 
 				test_time = job_time; // Set this in case we hit the while condition
 			} while(job_end_time.isAfter(end_time));
@@ -258,6 +274,9 @@ public class GenerateTapeOperations
 						System.err.println("\t- " + op.chunk_id[m]);
 					}
 				}
+
+				// Calculate task duration
+				op.task_duration = BPLogDateConverter.calcDuration(op.task_created, op.task_completed);
 
 				ops_list.add(op);
 			}

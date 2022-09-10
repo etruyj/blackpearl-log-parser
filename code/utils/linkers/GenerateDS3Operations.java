@@ -33,6 +33,7 @@ public class GenerateDS3Operations
 				op.type = task_list.get(i).type;
 				op.created_at = BPLogDateConverter.formatDataPlannerTimestamp(task_list.get(i).sd_copy.get(j).created_at);
 				op.date_completed = BPLogDateConverter.formatDataPlannerTimestamp(task_list.get(i).sd_copy.get(j).date_completed);
+				op.duration = BPLogDateConverter.calcDuration(op.created_at, op.date_completed);
 				op.chunks = task_list.get(i).chunk_id;
 				op.target_id = task_list.get(i).sd_copy.get(j).target_id;
 				op.target_name = task_list.get(i).sd_copy.get(j).target;

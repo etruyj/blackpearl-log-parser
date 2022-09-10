@@ -18,11 +18,12 @@ import java.time.LocalDateTime;
 
 public class BPLogDateConverter
 {
+	private static DateTimeFormatter excel_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 	public static String calcDuration(String t1, String t2)
 	{
-		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		LocalDateTime start = LocalDateTime.parse(t1, format);
-		LocalDateTime end = LocalDateTime.parse(t2, format);
+		LocalDateTime start = LocalDateTime.parse(t1, excel_format);
+		LocalDateTime end = LocalDateTime.parse(t2, excel_format);
 
 		Duration duration = Duration.between(start, end);
 
@@ -59,7 +60,6 @@ public class BPLogDateConverter
 	public static String formatCompletedJobsTimestamp(String timestamp)
 	{
 		DateTimeFormatter in_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 		// Check to see if the timestamp is null
 		if(timestamp == null)
 		{
@@ -72,14 +72,15 @@ public class BPLogDateConverter
 
 		LocalDateTime stamp = LocalDateTime.parse(cleaned_time[0], in_format);
 
-		return stamp.format(in_format);
+		return stamp.format(excel_format);
 	}
 
 	public static String formatDataPlannerTimestamp(String timestamp)
 	{
 		if(timestamp == null)
 		{
-			return "2001 Jan 01 00:00:01";
+			// In excel parsable format
+			return "2000-01-01 00:00:01";
 		}
 		else
 		{
@@ -87,7 +88,7 @@ public class BPLogDateConverter
 			DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 			LocalDateTime converted_timestamp = LocalDateTime.parse(timestamp, out_format);
 
-			return converted_timestamp.format(out_format);
+			return converted_timestamp.format(excel_format);
 		}
 	}
 
@@ -102,25 +103,9 @@ public class BPLogDateConverter
 			timestamp = reconstituteTimestamp(timestamp);
 			DateTimeFormatter out_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
 
-			return LocalDateTime.parse(timestamp, out_format).format(out_format);
+			return LocalDateTime.parse(timestamp, out_format).format(excel_format);
 		}
 	}
-
-/*	PENDING DELETE
- *	Not sure of the purpose of this function
- *
- * 	public static LocalDateTime formatForComparison(String timestamp)
-	{
-		if(timestamp == null)
-		{
-			return null;
-		}
-		else
-		{
-			timestamp = re
-		}
-	}
-*/
 
 	//=======================================
 	// Internal Functions

@@ -14,6 +14,7 @@ public class PoolOperation
 	public String pool_id;
 	public String created_at;
 	public String date_completed;
+	public String duration;
 	public String size;
 	public String throughput;
 	public String[] chunks;

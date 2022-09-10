@@ -17,6 +17,7 @@ import com.socialvagrancy.blackpearl.logs.commands.ListStorageDomains;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.ActiveJob;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
 
 import java.util.ArrayList;
@@ -34,9 +35,9 @@ public class Controller
 		ActiveJobStatus.testPrint(job_list);
 	}
 
-	public static void completedJobDetails(String path)
+	public static ArrayList<JobDetails> completedJobDetails(String path)
 	{
-		GatherCompletedJobDetails.forCompletedJobs(path, null);
+		return GatherCompletedJobDetails.forCompletedJobs(path, null);
 	}
 
 	public static void listBuckets(String path)

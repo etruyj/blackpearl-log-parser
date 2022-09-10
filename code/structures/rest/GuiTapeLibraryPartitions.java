@@ -16,6 +16,7 @@ public class GuiTapeLibraryPartitions
 	public int partitionCount() { return data.length; }
 	public String partitionID(int partition) { return data[partition].id; }
        	public String partitionName(int partition) { return data[partition].name; }	
+	public String serialNumber(int partition) { return data[partition].serial_number; }
 
 	//=======================================
 	// INNER CLASSES

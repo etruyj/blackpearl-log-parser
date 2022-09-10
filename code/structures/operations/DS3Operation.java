@@ -14,9 +14,12 @@ public class DS3Operation
 	public String type;
 	public String created_at;
 	public String date_completed;
+	public String duration;
 	public String[] chunks;
+	public String size;
 	public String target_id;
 	public String target_name;
+	public String throughput;
 
 	public int chunkCount()
 	{

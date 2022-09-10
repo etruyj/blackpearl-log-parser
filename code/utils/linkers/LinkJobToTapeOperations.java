@@ -8,6 +8,7 @@ package com.socialvagrancy.blackpearl.logs.utils.linkers;
 
 import com.socialvagrancy.blackpearl.logs.structures.CompletedJob;
 import com.socialvagrancy.blackpearl.logs.structures.operations.TapeOperation;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
 import com.socialvagrancy.blackpearl.logs.utils.BPLogDateConverter;
 import com.socialvagrancy.utils.Logger;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 
 public class LinkJobToTapeOperations
 {
-	public static ArrayList<JobDetails> createDetails(CompletedJob jobs, HashMap<String, ArrayList<String>> chunk_id_map, ArrayList<TapeOperation> ops_list, Logger log)
+	public static ArrayList<JobDetails> createDetails(CompletedJob jobs, HashMap<String, ArrayList<String>> chunk_id_map, HashMap<String, Bucket> id_bucket_map, ArrayList<TapeOperation> ops_list, Logger log)
 	{
 		ArrayList<JobDetails> detailed_list = new ArrayList<JobDetails>();
 		HashMap<String, ArrayList<TapeOperation>> chunk_op_map = MapTapeOperationsToChunk.createMap(ops_list);
@@ -29,14 +30,15 @@ public class LinkJobToTapeOperations
 
 		System.err.print("\n");
 		System.err.println("Job Count: " + jobs.data.length);
-		System.err.println("Chunk/ID Map size: " + chunk_id_map.size());
-		System.err.println("Chunk/Ops Map size: " + chunk_op_map.size());
+		System.err.println("Chunk/ID Map Size: " + chunk_id_map.size());
+		System.err.println("Chunk/Ops Map Size: " + chunk_op_map.size());
 		
 		for(int i=0; i < jobs.data.length; i++)
 		{
 			details = new JobDetails();
 			details.job_info = jobs.data[i];
 			
+			details.bucket = id_bucket_map.get(details.bucketID()).name;	
 			details.job_info.created_at = BPLogDateConverter.formatCompletedJobsTimestamp(details.job_info.created_at);
 			details.job_info.date_completed = BPLogDateConverter.formatCompletedJobsTimestamp(details.job_info.date_completed);
 
@@ -61,8 +63,8 @@ public class LinkJobToTapeOperations
 			}
 		}
 		
-		System.err.println("Jobs without data: " + dropped_job_count);
-		System.err.println("Jobs paired: " + detailed_list.size());
+		System.err.println("Jobs Without Data: " + dropped_job_count);
+		System.err.println("Job/Chunk Pairs: " + detailed_list.size());
 		System.err.print("\n");
 
 		return detailed_list;

@@ -30,7 +30,9 @@ public class MapTapeActivities
 		LocalDateTime timestamp;
 		String compare_drive = "empty"; // value to be compared to split the array down into individual tree maps.
 		String date;
+		DateTimeFormatter excel_format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		DateTimeFormatter in_format = DateTimeFormatter.ofPattern("yyyy MMM dd HH:mm:ss");
+		
 		// Order the array list by tape drive;
 		Collections.sort(action_list, (T t1, T t2) -> t1.drive_wwn.compareTo(t2.drive_wwn));
 		
@@ -59,7 +61,7 @@ public class MapTapeActivities
 				// adding a leading 0 to single digit dates. The output here is a string,
 				// so it needs to be converted back into LocalDateTime for the TreeMap. 
 				date = BPLogDateConverter.formatTapeBackendTimestamp(action_list.get(i).start_time);		
-				timestamp = LocalDateTime.parse(date, in_format);
+				timestamp = LocalDateTime.parse(date, excel_format);
 
 				log_tree.put(timestamp, action_list.get(i));
 			}

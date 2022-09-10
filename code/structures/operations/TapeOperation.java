@@ -17,6 +17,7 @@ public class TapeOperation
 	public String request_type;
 	public String[] chunk_id;
 	public String drive_wwn;
+	public String drive_number;
 	public String task_created;
 	public String task_completed;
 	public String task_duration;
@@ -27,6 +28,7 @@ public class TapeOperation
 	public boolean already_in_drive;
 	public String barcode;
 	public String partition_id;
+	public String partition_name;
 	public String source;
 	public String target;
 	public String mount_start;
