@@ -9,6 +9,7 @@ public class BPLogParser
 
 	public static void parseCommand(String command, String path, String output_format)
 	{
+		ArrayList to_print;
 		switch(command)
 		{
 			case "active-job-details":
@@ -20,11 +21,12 @@ public class BPLogParser
 				break;
 			case "completed-job-details":
 			case "job-details":
-				ArrayList<JobDetails> details_list = Controller.completedJobDetails(path);
-				Display.print(details_list, output_format);
+				to_print = Controller.completedJobDetails(path);
+				Display.print(to_print, output_format);
 				break;
 			case "list-buckets":
-				Controller.listBuckets(path);
+				to_print = Controller.listBuckets(path);
+				Display.print(to_print, output_format);
 				break;
 			case "list-data-policies":
 			case "list-policies":

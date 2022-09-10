@@ -40,10 +40,9 @@ public class Controller
 		return GatherCompletedJobDetails.forCompletedJobs(path, null);
 	}
 
-	public static void listBuckets(String path)
+	public static ArrayList<Bucket> listBuckets(String path)
 	{
-		ArrayList<Bucket> bucket_list = ListBuckets.fromRest(path);
-		ListBuckets.testPrint(bucket_list);
+		return ListBuckets.fromRest(path);
 	}
 
 	public static void listDataPolicies(String path)
