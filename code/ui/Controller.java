@@ -19,6 +19,7 @@ import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.SystemInfo;
 
 import java.util.ArrayList;
 
@@ -29,10 +30,9 @@ public class Controller
 		GatherActiveJobDetails.fromLogs(path, null);
 	}
 
-	public static void activeJobStatus(String path)
+	public static ArrayList<ActiveJob> activeJobStatus(String path)
 	{
-		ArrayList<ActiveJob> job_list = ActiveJobStatus.fromRest(path);
-		ActiveJobStatus.testPrint(job_list);
+		return ActiveJobStatus.fromRest(path);
 	}
 
 	public static ArrayList<JobDetails> completedJobDetails(String path)
@@ -45,20 +45,18 @@ public class Controller
 		return ListBuckets.fromRest(path);
 	}
 
-	public static void listDataPolicies(String path)
+	public static ArrayList<DataPolicy> listDataPolicies(String path)
 	{
-		ArrayList<DataPolicy> policy_list = ListDataPolicies.fromRest(path);
-		ListDataPolicies.testPrint(policy_list);
+		return ListDataPolicies.fromRest(path);
 	}
 
-	public static void listStorageDomains(String path)
+	public static ArrayList<StorageDomain> listStorageDomains(String path)
 	{
-		ArrayList<StorageDomain> domain_list = ListStorageDomains.fromRest(path);
-		ListStorageDomains.testPrint(domain_list);
+		return ListStorageDomains.fromRest(path);
 	}
 
-	public static void systemInfo(String path)
+	public static ArrayList<SystemInfo> systemInfo(String path)
 	{
-		GetSystemInfo.fromJson(path);
+		return GetSystemInfo.fromJson(path);
 	}
 }

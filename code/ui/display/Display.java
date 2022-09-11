@@ -24,7 +24,21 @@ public class Display
 	{
 		ArrayList<OutputFormat> output = Serializer.serialize(to_print);
 		
-		Table.format(output, output_format);		
+		if(output.size() > 0)
+		{
+			if(output_format.equals("csv") || output_format.equals("table"))
+			{	
+				Table.format(output, output_format);
+			}
+			else if(output_format.equals("shell"))
+			{
+				System.err.println("ERROR: Shell output unavailable.");
+			}
+			else
+			{
+				System.err.println("ERROR: Invalid output format specified. Please view -h/--help to see valid formats");
+			}		
+		}
 	}
 
 	public static void fromFile(String file_path)

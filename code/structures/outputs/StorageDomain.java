@@ -33,12 +33,12 @@ public class StorageDomain
 	}
 
 	public String getID() { return id; }
-	public int getMemberCount() { return members.size(); }
-	public String getMemberName(int id) { return members.get(id).member_name; }
-	public String getName() { return name; }
-	public String getWriteOptimization() { return write_optimization; }
+	public int memberCount() { return members.size(); }
+	public String memberName(int id) { return members.get(id).member_name; }
+	public String name() { return name; }
+	public String writeOptimization() { return write_optimization; }
 
-	public String getMemberType(int id)
+	public String memberType(int id)
 	{
 		return members.get(id).getType(); 
 
@@ -57,12 +57,12 @@ public class StorageDomain
 		*/
 	}
 
-	public String getState(int id)
+	public String memberState(int id)
 	{
 		return members.get(id).state;
 	}
 
-	public String getTapeType(int id)
+	public String memberTapeType(int id)
 	{
 		return members.get(id).tape_type;
 	}
@@ -82,7 +82,7 @@ public class StorageDomain
 		return "none";
 	}
 
-	public String getWritePerference(int id)
+	public String memberWritePreference(int id)
 	{
 		return members.get(id).write_preference;
 	}
