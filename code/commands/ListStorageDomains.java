@@ -31,25 +31,4 @@ public class ListStorageDomains
 
 		return domain_list;
 	}
-
-	public static void testPrint(ArrayList<StorageDomain> domain_list)
-	{
-		for(int i=0; i<domain_list.size(); i++)
-		{
-			System.out.println(domain_list.get(i).name + " write_optimization: " + domain_list.get(i).write_optimization);
-
-			for(int j=0; j<domain_list.get(i).getMemberCount(); j++)
-			{
-				if(domain_list.get(i).getMemberType(j).equals("pool"))
-				{
-					System.out.println("\t- " + domain_list.get(i).getMemberType(j) + ":" + domain_list.get(i).getMemberName(j));
-
-				}
-				else if(domain_list.get(i).getMemberType(j).equals("tape"))
-				{
-					System.out.println("\t- " + domain_list.get(i).getMemberType(j) + ":" + domain_list.get(i).getMemberName(j) + " (" + domain_list.get(i).getTapeType(j) + ")");
-				}
-			}
-		}
-	}
 }

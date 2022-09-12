@@ -19,7 +19,7 @@ public class TapeActivity
 	public String start_time;
 	public String end_time;
 
-	public int compareTo(TapeExchange e)
+	public int compareTo(TapeActivity e)
 	{
 		return this.drive_wwn.compareTo(e.drive_wwn);
 	}

@@ -17,7 +17,7 @@ public class Pool
 	public String health;
 	public String raw_size;
 	public RebuildStatus rebuild_status;
-	public String scrub_status;
+	public ScrubStatus scrub_status;
 	public String status;
 	public String available;
 	public String overhead;
@@ -60,6 +60,20 @@ public class Pool
 		String end_time;
 		int percent_complete;
 		String eta;
+	}
+
+	public class ScrubStatus
+	{
+		String state;
+		String start_time;
+		int minutes_left;
+		int minutes_take;
+		BigInteger bytes_to_scan;
+		BigInteger bytes_scanned;
+		int errors;
+		String end_time;
+		int percent_complete;
+		int eta;
 	}
 
 	public class Topology

@@ -50,25 +50,4 @@ public class ListDataPolicies
 
 		return policy_list;
 	}
-
-	public static void testPrint(ArrayList<DataPolicy> policy_list)
-	{
-		for(int i=0; i<policy_list.size(); i++)
-		{
-			System.out.println(policy_list.get(i).name + ":");
-
-			for(int j=0; j < policy_list.get(i).getStorageDomainCount(); j++)
-			{
-				System.out.println("\t- " + policy_list.get(i).domains_list.get(j).name 
-						+ " rules: " + policy_list.get(i).domains_list.get(j).getMemberCount());
-			}
-
-			for(int k=0; k < policy_list.get(i).replicationRuleCount(); k++)
-			{
-				System.out.println("\t- " + policy_list.get(i).replicationTargetType(k) + " " 
-						+ policy_list.get(i).replicationTargetName(k) + " "
-						+ policy_list.get(i).replicationTargetIP(k));
-			}
-		}
-	}
 }

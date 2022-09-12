@@ -13,9 +13,6 @@ public class BPLogParser
 		
 		switch(command)
 		{
-			case "active-job-details":
-				Controller.activeJobDetails(path);
-				break;
 			case "active-job-status":
 			case "job-status":
 				to_print = Controller.activeJobStatus(path);
