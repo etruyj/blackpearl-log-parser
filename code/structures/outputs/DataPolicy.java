@@ -27,18 +27,20 @@ public class DataPolicy
 	// Functions
 	//=======================================
 
-	public String getID() { return id; }
 
-	public int dataCopies() { return domains_list.size() + replication_list.size(); }
-	public int replicationRuleCount() { return replication_list.size(); }
 	public int getStorageDomainCount() { return domains_list.size(); }
 
 	// Get
 
+	public int dataCopies() { return domains_list.size() + replication_list.size(); }
+	public String getID() { return id; }
+	public int replicationRuleCount() { return replication_list.size(); }
 	public String replicationTargetID(int i) { return replication_list.get(i).target_id; }
 	public String replicationTargetIP(int i) { return replication_list.get(i).target_ip; }
 	public String replicationTargetName(int i) { return replication_list.get(i).target_name; }
 	public String replicationTargetType(int i) { return replication_list.get(i).type; }
+	public String storageDomainName(int i) { return domains_list.get(i).name; }
+	public int storageDomainMemberCount(int i) { return domains_list.get(i).memberCount(); }
 
 	// Setters
 
