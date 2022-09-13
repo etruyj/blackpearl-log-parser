@@ -70,7 +70,16 @@ public class GenerateStorageDomains
 			if(members.getMemberType(i).equals("pool"))
 			{
 				id = members.getMemberID(i);
-				name = pool_id_map.get(id).name;
+				
+				try 
+				{ 
+					name = pool_id_map.get(id).name; 
+				}
+				catch(Exception e)
+				{
+					System.err.println("WARN: Cannot find pool with id " + id);
+					name = "[unknown]";
+				}
 				members.setMemberName(i, name);
 			}
 			else

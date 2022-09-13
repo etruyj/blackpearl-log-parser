@@ -108,7 +108,7 @@ public class SerializeStorageDomains
 
 		for(int i=0; i < domain_list.size(); i++)
 		{
-			if(domain_list.get(i).memberCount() < memberCount)
+			if(domain_list.get(i).memberCount() > memberCount)
 			{
 				memberCount = domain_list.get(i).memberCount();
 			}
