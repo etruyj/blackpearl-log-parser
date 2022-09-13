@@ -22,22 +22,31 @@ public class Display
 {
 	public static void print(ArrayList to_print, String output_format)
 	{
-		ArrayList<OutputFormat> output = Serializer.serialize(to_print);
-		
-		if(output.size() > 0)
+		// Allow output of full variables
+		if(output_format.equals("json"))
 		{
-			if(output_format.equals("csv") || output_format.equals("table"))
-			{	
-				Table.format(output, output_format);
-			}
-			else if(output_format.equals("shell"))
+			PrintJSON.toShell(to_print);
+		}
+		// Or format variable for alternative outputs
+		else
+		{
+			ArrayList<OutputFormat> output = Serializer.serialize(to_print);
+		
+			if(output.size() > 0)
 			{
-				System.err.println("ERROR: Shell output unavailable.");
+				if(output_format.equals("csv") || output_format.equals("table"))
+				{	
+					Table.format(output, output_format);
+				}
+				else if(output_format.equals("shell"))
+				{
+					System.err.println("ERROR: Shell output unavailable.");
+				}
+				else
+				{
+					System.err.println("ERROR: Invalid output format specified. Please view -h/--help to see valid formats");
+				}		
 			}
-			else
-			{
-				System.err.println("ERROR: Invalid output format specified. Please view -h/--help to see valid formats");
-			}		
 		}
 	}
 

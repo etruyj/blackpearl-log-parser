@@ -7,6 +7,7 @@
 package com.socialvagrancy.blackpearl.logs.ui;
 
 import com.socialvagrancy.blackpearl.logs.commands.ActiveJobStatus;
+import com.socialvagrancy.blackpearl.logs.commands.FetchConfig;
 import com.socialvagrancy.blackpearl.logs.commands.GatherCompletedJobDetails;
 import com.socialvagrancy.blackpearl.logs.commands.GetSystemInfo;
 import com.socialvagrancy.blackpearl.logs.commands.ListBuckets;
@@ -14,6 +15,7 @@ import com.socialvagrancy.blackpearl.logs.commands.ListDataPolicies;
 import com.socialvagrancy.blackpearl.logs.commands.ListStorageDomains;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.ActiveJob;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.Configuration;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
@@ -31,6 +33,11 @@ public class Controller
 	public static ArrayList<JobDetails> completedJobDetails(String path)
 	{
 		return GatherCompletedJobDetails.forCompletedJobs(path, null);
+	}
+
+	public static ArrayList<Configuration> fetchConfiguration(String path)
+	{
+		return FetchConfig.fromRest(path);
 	}
 
 	public static ArrayList<Bucket> listBuckets(String path)

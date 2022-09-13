@@ -27,4 +27,16 @@ public class MapPoolIDtoPool
 
 		return pool_map;
 	}
+
+	public static HashMap<String, Pool> createMapForNAS(Pools pool_info)
+	{
+		HashMap<String, Pool> pool_map = new HashMap<String, Pool>();
+
+		for(int i=0; i<pool_info.data.length; i++)
+		{
+			pool_map.put(pool_info.data[i].id, pool_info.data[i]);
+		}
+
+		return pool_map;
+	}
 }
