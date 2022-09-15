@@ -14,6 +14,7 @@ import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.ReplicationRule;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
 import com.socialvagrancy.blackpearl.logs.structures.rest.GuiDataPolicy;
+import com.socialvagrancy.blackpearl.logs.structures.rest.GuiDataPersistenceRules;
 import com.socialvagrancy.blackpearl.logs.structures.rest.GuiAzureRepRules;
 import com.socialvagrancy.blackpearl.logs.structures.rest.GuiAzureRepTargets;
 import com.socialvagrancy.blackpearl.logs.structures.rest.GuiDS3RepRules;
@@ -26,9 +27,11 @@ import java.util.HashMap;
 
 public class GenerateDataPolicy
 {
-	public static ArrayList<DataPolicy> fromRest(GuiDataPolicy policies, HashMap<String, ArrayList<String>> dp_to_sd_id_map, ArrayList<StorageDomain> domains_list)
+	public static ArrayList<DataPolicy> fromRest(GuiDataPolicy policies, /*HashMap<String, ArrayList<String>> dp_to_sd_id_map,*/ GuiDataPersistenceRules persistence_rules, ArrayList<StorageDomain> domains_list)
 	{
 		ArrayList<DataPolicy> policy_list = new ArrayList<DataPolicy>();
+		HashMap<String, GuiDataPersistenceRules.PersistenceRule> rule_id_map = MapPersistenceRuleToID.createMap(persistence_rules);
+		HashMap<String, ArrayList<String>> dp_to_pr_id_map = MapDataPolicyIDtoPersistenceRuleIDs.createMap(persistence_rules);
 		HashMap<String, StorageDomain> domain_map = MapStorageDomainToID.createMap(domains_list);
 		DataPolicy data_policy;
 		String storage_domain_id;
@@ -39,18 +42,47 @@ public class GenerateDataPolicy
 
 			data_policy.name = policies.getName(i);
 			data_policy.id = policies.getID(i);
+			data_policy.blobbing_enabled = policies.blobbing(i);
+			data_policy.minimize_spanning = policies.spanning(i);
+			data_policy.default_get_priority = policies.priorityGet(i);
+			data_policy.default_put_priority = policies.priorityPut(i);
+			data_policy.default_verify_priority = policies.priorityVerify(i);
+			data_policy.rebuild_priority = policies.priorityRebuild(i);
+			data_policy.checksum = policies.checksumType(i);
+			data_policy.end_to_end_crc = policies.endToEndCRC(i);
+			data_policy.versioning = policies.versioning(i);
+			data_policy.versions_to_keep = policies.versionsToKeep(i);
 
 			// Quick check for null values
 			// It is possible for data policies not to have persistence rules assigned.
 
-			if(dp_to_sd_id_map.get(data_policy.id) != null)
+			if(dp_to_pr_id_map.get(data_policy.id) != null)
 			{
-				for(int j=0; j < dp_to_sd_id_map.get(data_policy.id).size(); j++)
+				String pr_id; // persistence rule id;
+				String sd_id; // storage domain id
+	
+				for(int j=0; j < dp_to_pr_id_map.get(data_policy.id).size(); j++)
 				{
-					storage_domain_id = dp_to_sd_id_map.get(data_policy.id).get(j);
+					pr_id = dp_to_pr_id_map.get(data_policy.id).get(j);
+				
+					if(rule_id_map.get(pr_id) == null)
+					{
+						System.err.println("WARN: unable to find persistence rule with id " + pr_id);
+					}
+					else
+					{	
+						GuiDataPersistenceRules.PersistenceRule rule = rule_id_map.get(pr_id);
 
-					data_policy.addPersistenceRule(domain_map.get(storage_domain_id));	
+						sd_id = rule.storage_domain_id;
+
+						data_policy.addPersistenceRule(domain_map.get(sd_id), rule.type,
+								rule.state, rule.isolation_level, rule.minimum_days_to_retain);	
+					}
 				}
+			}
+			else
+			{
+				System.err.println("WARN: No data persistence rules found for data policy " + data_policy.name);
 			}
 
 			policy_list.add(data_policy);
@@ -59,11 +91,11 @@ public class GenerateDataPolicy
 		return policy_list;
 	}
 	
-	public static ArrayList<DataPolicy> withReplication(GuiDataPolicy policies, HashMap<String, ArrayList<String>> dp_to_sd_id_map, ArrayList<StorageDomain> domains_list, GuiDS3RepRules ds3_rep_rules, GuiDS3RepTargets ds3_targets, GuiS3RepRules s3_rep_rules, GuiS3Targets s3_rep_targets, GuiAzureRepRules azure_rep_rules, GuiAzureRepTargets azure_rep_targets)
+	public static ArrayList<DataPolicy> withReplication(GuiDataPolicy policies, /*HashMap<String, ArrayList<String>> dp_to_sd_id_map,*/ GuiDataPersistenceRules persistence_rules, ArrayList<StorageDomain> domains_list, GuiDS3RepRules ds3_rep_rules, GuiDS3RepTargets ds3_targets, GuiS3RepRules s3_rep_rules, GuiS3Targets s3_rep_targets, GuiAzureRepRules azure_rep_rules, GuiAzureRepTargets azure_rep_targets)
 	{
 		// The replication rule free version was coded first. To avoid
 		// rejiggering it, this function was put just above it.
-		ArrayList<DataPolicy> policy_list = fromRest(policies, dp_to_sd_id_map, domains_list);
+		ArrayList<DataPolicy> policy_list = fromRest(policies, persistence_rules, domains_list);
 		
 		HashMap<String, Integer> policy_map = MapDataPolicyToID.createIndexMap(policy_list);
 

@@ -15,8 +15,9 @@ import com.google.gson.JsonParseException;
 
 public class GetDataPersistenceRules
 {
-	public static GuiDataPersistenceRules fromJson(String file_path)
+	public static GuiDataPersistenceRules fromJson(String dir_path)
 	{
+		String file_path = dir_path + "rest/gui_ds3_data_persistence_rules.json";
 		Gson gson = new Gson();
 		String json = LoadFile.json(file_path);
 

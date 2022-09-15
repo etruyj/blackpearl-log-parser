@@ -8,7 +8,7 @@ package com.socialvagrancy.blackpearl.logs.structures.rest;
 
 public class GuiDataPersistenceRules
 {
-	public DataPersistenceRule[] data;
+	public PersistenceRule[] data;
 	//=======================================
 	// Functions
 	//=======================================
@@ -25,14 +25,16 @@ public class GuiDataPersistenceRules
 		}
 	}
 
+	public String id(int rule) { return data[rule].id; }
 	public String getDataPolicyID(int rule) { return data[rule].data_policy_id; }
+	public PersistenceRule getRule(int rule) { return data[rule]; }
 	public String getStorageDomainID(int rule) { return data[rule].storage_domain_id; }
 
 	//=======================================
 	// Inner Classes
 	//=======================================
 	
-	public class DataPersistenceRule
+	public class PersistenceRule
 	{
 		public String data_policy_id;
 		public String isolation_level;

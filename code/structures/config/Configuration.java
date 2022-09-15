@@ -16,7 +16,8 @@ public class Configuration
 	ArrayList<PoolConfig> pools;
 	ArrayList<VolumeConfig> volumes;
 	ShareData shares;
-	ArrayList<StorageDomain> storage_domains;
+	ArrayList<DiskPartitionConfig> disk_partitions;
+	ArrayList<StorageDomainConfig> storage_domains;
 	ArrayList<DataPolicyConfig> data_policies;
 	ArrayList<BucketConfig> buckets;
 
@@ -31,17 +32,14 @@ public class Configuration
 	// Setters
 	//=======================================
 
-	public void addBucket(String bname, String bpolicy, String bowner)
+	public void add(BucketConfig bucket)
 	{
 		if(buckets == null)
 		{
 			buckets = new ArrayList<BucketConfig>();
 		}
 	
-		BucketConfig bucket = new BucketConfig(bname, bpolicy, bowner);
-
 		buckets.add(bucket);
-	
 	}
 
 	public void add(DataPolicyConfig policy)
@@ -52,6 +50,16 @@ public class Configuration
 		}
 	
 		data_policies.add(policy);
+	}
+
+	public void add(DiskPartitionConfig disk)
+	{
+		if(disk_partitions == null)
+		{
+			disk_partitions = new ArrayList<DiskPartitionConfig>();
+		}
+
+		disk_partitions.add(disk);
 	}
 
 	public void add(PoolConfig pool)
@@ -111,16 +119,14 @@ public class Configuration
 		volumes.add(volume);
 	}
 
-	public void addStorageDomains(ArrayList<StorageDomain> domains)
+	public void add(StorageDomainConfig domain)
 	{
 		if(storage_domains == null)
 		{
-			storage_domains = domains;
+			storage_domains = new ArrayList<StorageDomainConfig>();
 		}
-		else
-		{
-			storage_domains.addAll(domains);
-		}
+	
+		storage_domains.add(domain);
 	}
 
 	private void createShareData()

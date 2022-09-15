@@ -36,7 +36,7 @@ public class GuiStorageDomains
 		public String write_optimization;
 		public boolean secure_media_allocation;
 		public boolean media_ejection_allowed;
-		public boolean auto_eject_upon_cron;
+		public String auto_eject_upon_cron;
 		public boolean auto_eject_upon_completion;
 		public boolean auto_eject_upon_cancellation;
 		public boolean auto_eject_upon_media_full;
@@ -47,4 +47,4 @@ public class GuiStorageDomains
 		public String updated_at;
 		public String id;
 	}
-}
+}	
