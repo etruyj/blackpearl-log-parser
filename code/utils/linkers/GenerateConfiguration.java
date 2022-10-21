@@ -171,8 +171,8 @@ public class GenerateConfiguration
 
 			for(int i=0; i < pools.poolCount(); i++)
 			{
-				pool = new PoolConfig(pools.name(i), pools.highWater(i),
-						pools.powerSavingMode(i), pools.driveCount(i), pools.protection(i));
+				pool = new PoolConfig(pools.name(i), pools.type(i), pools.highWater(i),
+						pools.powerSavingMode(i), pools.driveCount(i), pools.protection(i), pools.stripes(i));
 
 				config.add(pool);
 			}

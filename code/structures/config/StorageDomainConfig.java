@@ -20,12 +20,12 @@ public class StorageDomainConfig
 	boolean auto_eject_upon_cancellation;
 	boolean auto_eject_upon_media_full;
 	String media_ejection_upon_cron;
-	boolean verify_prior_to_auto_eject;
+	String verify_prior_to_auto_eject;
 	ArrayList<StorageDomainMemberConfig> members;
 
 	public StorageDomainConfig(String n, int verify, String optimization, String file_naming,
 			boolean eject_allowed, boolean eject_on_complete, boolean eject_on_cancel, boolean eject_on_full,
-			String scheduled_eject, boolean verify_before_eject)
+			String scheduled_eject, String verify_before_eject)
 	{
 		name = n;
 		days_to_verify = verify;

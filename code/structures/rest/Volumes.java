@@ -57,7 +57,7 @@ public class Volumes
 		String nfi_volume_policy_bucket_id;
 		String nfi_volume_policy;
 		int nfi_volume_policy_days_to_keep;
-		String nfi_volume_policy_cront_string;
+		String nfi_volume_policy_cron_string;
 		boolean nfi_volume_policy_start_when_in_cache;
 		String[] nfi_volume_policy_ds3_job_ids;
 		boolean replication_volume_policy_enabled;

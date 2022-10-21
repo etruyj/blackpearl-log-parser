@@ -13,7 +13,7 @@ public class Pool
 	public String id;
 	public String name;
 	public String protection;
-	public String stripes;
+	public int stripes;
 	public String health;
 	public String raw_size;
 	public RebuildStatus rebuild_status;

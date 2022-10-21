@@ -42,7 +42,7 @@ public class GuiStorageDomains
 		public boolean auto_eject_upon_media_full;
 		public int maximum_auto_verification_frequency_in_days;
 		public String ltfs_file_naming;
-		public boolean verify_prior_to_auto_eject;
+		public String verify_prior_to_auto_eject;
 		public String created_at;
 		public String updated_at;
 		public String id;

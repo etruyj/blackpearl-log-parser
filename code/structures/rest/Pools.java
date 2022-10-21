@@ -19,4 +19,6 @@ public class Pools
 	public int poolCount() { return data.length; }
 	public String powerSavingMode(int pool) { return data[pool].power_saving_mode; }
 	public String protection(int pool) { return data[pool].protection; }
+	public int stripes(int pool) { return data[pool].stripes; }
+	public String type(int pool) { return data[pool].type; }
 }
