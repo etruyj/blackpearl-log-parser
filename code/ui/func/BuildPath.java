@@ -14,6 +14,7 @@ public class BuildPath
 
 		if(isWindows(path))
 		{
+			dir = findRootPathWindows(path);
 		}
 		else
 		{
@@ -27,7 +28,11 @@ public class BuildPath
 	{
 		// Find the part of the path that points to manual.
 		String[] parts = path.split("/");
-		String searchFor = "manual";
+		String[] searchFor = new String[3];
+	       	searchFor[0] = "manual";
+	       	searchFor[1] = "error";
+	       	searchFor[2] = "scheduled";
+		
 		String dir;
 		int start;
 
@@ -49,8 +54,20 @@ public class BuildPath
 
 		while(itr >= 0 && searching)
 		{
-			if(parts[itr].length() > searchFor.length() &&
-					parts[itr].substring(0, searchFor.length()).equals(searchFor))
+			if(parts[itr].length() > searchFor[0].length() &&
+					parts[itr].substring(0, searchFor[0].length()).equals(searchFor[0]))
+			{
+				// Found the root path.
+				searching = false;
+			}
+			else if(parts[itr].length() > searchFor[1].length() &&
+					parts[itr].substring(0, searchFor[1].length()).equals(searchFor[1]))
+			{
+				// Found the root path.
+				searching = false;
+			}
+			else if(parts[itr].length() > searchFor[2].length() &&
+					parts[itr].substring(0, searchFor[2].length()).equals(searchFor[2]))
 			{
 				// Found the root path.
 				searching = false;
@@ -71,9 +88,41 @@ public class BuildPath
 		return dir;
 	}
 
-	public static boolean isWindows(String pwd)
+	public static String findRootPathWindows(String path)
 	{
-		if(pwd.substring(0,1).equals("/") || pwd.substring(0,1).equals("."))
+		String[] path_parts = path.split("\\\\");
+		String root_path = "";
+		
+		boolean searching = true;
+		int counter = 0;
+		
+		while(searching)
+		{
+			root_path += path_parts[counter] + "/";
+
+			if(path_parts[counter].length() >= 6 && path_parts[counter].substring(0,6).equals("manual"))
+			{
+				searching = false;
+			}
+			else if(path_parts[counter].length() >= 5 && path_parts[counter].substring(0,5).equals("error"))
+			{
+				searching = false;
+			}
+			else if(path_parts[counter].length() >= 9 && path_parts[counter].substring(0,9).equals("scheduled"))
+			{
+				searching = false;
+			}
+			
+			counter++;
+		}
+
+		return root_path;
+	}
+
+	public static boolean isWindows(String path)
+	{
+
+		if(path.substring(0,1).equals("/") || path.substring(0,1).equals("."))
 		{
 			return false;
 		}

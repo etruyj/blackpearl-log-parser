@@ -25,7 +25,6 @@ public class ArgParser
 
 	public void parseArgs(String[] args)
 	{
-
 		if(args.length == 2)
 		{
 			setCommand(args[0]);
