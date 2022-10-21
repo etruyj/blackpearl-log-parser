@@ -21,6 +21,7 @@ import com.socialvagrancy.blackpearl.logs.structures.config.VolumeConfig;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
+import com.socialvagrancy.blackpearl.logs.structures.rest.ActivationKeys;
 import com.socialvagrancy.blackpearl.logs.structures.rest.Pools;
 import com.socialvagrancy.blackpearl.logs.structures.rest.GuiPoolPartitions;
 import com.socialvagrancy.blackpearl.logs.structures.rest.Shares;
@@ -32,12 +33,13 @@ import java.util.HashMap;
 
 public class GenerateConfiguration
 {
-	public static Configuration buildConfig(ArrayList<Bucket> bucket_list, ArrayList<DataPolicy> policy_list, ArrayList<StorageDomain> domain_list, Pools pools, Volumes volumes, Shares shares, GuiPoolPartitions disk_partitions)
+	public static Configuration buildConfig(ActivationKeys keys, ArrayList<Bucket> bucket_list, ArrayList<DataPolicy> policy_list, ArrayList<StorageDomain> domain_list, Pools pools, Volumes volumes, Shares shares, GuiPoolPartitions disk_partitions)
 	{
 		Configuration config = new Configuration();
 		
 		HashMap<String, Pool> pool_id_map = MapPoolIDtoPool.createMapForNAS(pools);
 		HashMap<String, Volumes.Volume> vol_id_map = MapVolumeToID.createMap(volumes);
+		config = addActivationKeys(keys, config);
 		config = addBuckets(bucket_list, config);
 		config = addDataPolicies(policy_list, config);
 		config = addPools(pools, config);
@@ -53,6 +55,26 @@ public class GenerateConfiguration
 	// Functions
 	//=======================================
 	
+	private static Configuration addActivationKeys(ActivationKeys keys, Configuration config)
+	{
+		if(keys == null || keys.count() == 0)
+		{
+			System.err.println("INFO: No activation keys found.");
+		}
+		else
+		{
+			for(int i=0; i<keys.count(); i++)
+			{
+				if(!keys.expired(i) && !keys.key(i).equals("SYSTEM"))
+				{
+					config.add(keys.key(i));
+				}
+			}
+		}
+
+		return config;
+	}
+
 	private static Configuration addBuckets(ArrayList<Bucket> bucket_list, Configuration config)
 	{
 		if(bucket_list == null)

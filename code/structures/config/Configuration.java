@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 public class Configuration
 {
+	ArrayList<String> activation_keys;
 	ArrayList<PoolConfig> pools;
 	ArrayList<VolumeConfig> volumes;
 	ShareData shares;
@@ -31,6 +32,16 @@ public class Configuration
 	//=======================================
 	// Setters
 	//=======================================
+
+	public void add(String key)
+	{
+		if(activation_keys == null)
+		{
+			activation_keys = new ArrayList<String>();
+		}
+
+		activation_keys.add(key);
+	}
 
 	public void add(BucketConfig bucket)
 	{
