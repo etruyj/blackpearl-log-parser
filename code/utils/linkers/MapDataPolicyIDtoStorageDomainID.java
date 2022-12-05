@@ -19,13 +19,16 @@ public class MapDataPolicyIDtoStorageDomainID
 		HashMap<String, ArrayList<String>> id_map = new HashMap<String, ArrayList<String>>();
 		ArrayList<String> domain_list;
 
-		for(int i=0; i< rules.getRuleCount(); i++)
+		if(rules != null)
 		{
-			domain_list = getList(id_map, rules.getDataPolicyID(i));
+			for(int i=0; i< rules.getRuleCount(); i++)
+			{
+				domain_list = getList(id_map, rules.getDataPolicyID(i));
 			
-			domain_list.add(rules.getStorageDomainID(i));
+				domain_list.add(rules.getStorageDomainID(i));
 
-			id_map.put(rules.getDataPolicyID(i), domain_list);
+				id_map.put(rules.getDataPolicyID(i), domain_list);
+			}
 		}
 
 		return id_map;

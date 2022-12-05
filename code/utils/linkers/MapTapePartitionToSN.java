@@ -17,9 +17,12 @@ public class MapTapePartitionToSN
 	{
 		HashMap<String, GuiTapeLibraryPartitions.TapePartition> partition_map = new HashMap<String, GuiTapeLibraryPartitions.TapePartition>();
 
-		for(int i=0; i<tape_partitions.partitionCount(); i++)
+		if(tape_partitions != null)
 		{
-			partition_map.put(tape_partitions.serialNumber(i), tape_partitions.data[i]);
+			for(int i=0; i<tape_partitions.partitionCount(); i++)
+			{
+				partition_map.put(tape_partitions.serialNumber(i), tape_partitions.data[i]);
+			}
 		}
 
 		return partition_map;

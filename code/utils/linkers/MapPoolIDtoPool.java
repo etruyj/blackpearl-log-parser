@@ -20,9 +20,12 @@ public class MapPoolIDtoPool
 	{
 		HashMap<String, Pool> pool_map = new HashMap<String, Pool>();
 
-		for(int i=0; i<pool_info.data.length; i++)
+		if(pool_info != null)
 		{
-			pool_map.put(pool_info.data[i].partition_id, pool_info.data[i]);
+			for(int i=0; i<pool_info.data.length; i++)
+			{
+				pool_map.put(pool_info.data[i].partition_id, pool_info.data[i]);
+			}
 		}
 
 		return pool_map;
@@ -32,9 +35,12 @@ public class MapPoolIDtoPool
 	{
 		HashMap<String, Pool> pool_map = new HashMap<String, Pool>();
 
-		for(int i=0; i<pool_info.data.length; i++)
+		if(pool_info != null)
 		{
-			pool_map.put(pool_info.data[i].id, pool_info.data[i]);
+			for(int i=0; i<pool_info.data.length; i++)
+			{
+				pool_map.put(pool_info.data[i].id, pool_info.data[i]);
+			}
 		}
 
 		return pool_map;

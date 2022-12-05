@@ -34,7 +34,7 @@ public class Pool
 	public int special_used;
 	public String[] disk_ids;
 	public Topology[] topology;
-	public String[] log;
+	public Topology[] log;
 	public String[] zil_drives;
 	public String[] special;
 	public String[] special_drives;

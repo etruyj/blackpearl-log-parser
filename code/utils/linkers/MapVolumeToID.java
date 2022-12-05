@@ -19,9 +19,12 @@ public class MapVolumeToID
 	{
 		HashMap<String, Volumes.Volume> volume_map = new HashMap<String, Volumes.Volume>();
 
-		for(int i=0; i< vol.volumeCount(); i++)
+		if(vol != null)
 		{
-			volume_map.put(vol.id(i), vol.volumeData(i));
+			for(int i=0; i< vol.volumeCount(); i++)
+			{
+				volume_map.put(vol.id(i), vol.volumeData(i));
+			}
 		}
 
 		return volume_map;

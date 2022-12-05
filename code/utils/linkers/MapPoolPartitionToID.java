@@ -15,10 +15,13 @@ public class MapPoolPartitionToID
 	public static HashMap<String, GuiPoolPartitions.PoolPartition> createMap(GuiPoolPartitions pars)
 	{
 		HashMap<String, GuiPoolPartitions.PoolPartition> pars_map = new HashMap<String, GuiPoolPartitions.PoolPartition>();
-
-		for(int i=0; i< pars.count(); i++)
+		
+		if(pars != null)
 		{
-			pars_map.put(pars.id(i), pars.partitionData(i));
+			for(int i=0; i< pars.count(); i++)
+			{
+				pars_map.put(pars.id(i), pars.partitionData(i));
+			}
 		}
 
 		return pars_map;

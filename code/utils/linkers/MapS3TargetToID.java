@@ -25,10 +25,13 @@ public class MapS3TargetToID
 	public static HashMap<String, Integer> createMap(GuiS3Targets targets)
 	{
 		HashMap<String, Integer> target_map = new HashMap<String, Integer>();
-	
-		for(int i=0; i<targets.targetCount(); i++)
-		{
-			target_map.put(targets.id(i), i);
+
+		if(targets != null)
+		{	
+			for(int i=0; i<targets.targetCount(); i++)
+			{
+				target_map.put(targets.id(i), i);
+			}
 		}
 
 		return target_map;

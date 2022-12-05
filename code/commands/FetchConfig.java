@@ -45,6 +45,11 @@ public class FetchConfig
 		Shares shares = GetShareData.fromRest(dir_path);
 		Volumes volumes = GetVolumeData.fromRest(dir_path);
 
+		if(pools==null)
+		{
+			System.err.println("ERR: No pools imported.");
+		}
+
 		// Advanced Bucket Management Info
 		GuiPoolPartitions disk_partitions = GetPoolPartitionData.fromRest(dir_path);
 		ArrayList<Bucket> bucket_list = ListBuckets.fromRest(dir_path);

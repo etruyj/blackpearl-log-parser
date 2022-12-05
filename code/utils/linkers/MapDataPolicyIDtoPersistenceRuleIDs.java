@@ -21,13 +21,16 @@ public class MapDataPolicyIDtoPersistenceRuleIDs
 		HashMap<String, ArrayList<String>> id_map = new HashMap<String, ArrayList<String>>();
 		ArrayList<String> id_list;
 
-		for(int i=0; i< rules.getRuleCount(); i++)
+		if(rules != null)
 		{
-			id_list = getList(id_map, rules.getDataPolicyID(i));
-			
-			id_list.add(rules.id(i));
+			for(int i=0; i< rules.getRuleCount(); i++)
+			{
+				id_list = getList(id_map, rules.getDataPolicyID(i));
+				
+				id_list.add(rules.id(i));
 
-			id_map.put(rules.getDataPolicyID(i), id_list);
+				id_map.put(rules.getDataPolicyID(i), id_list);
+			}
 		}
 
 		return id_map;
