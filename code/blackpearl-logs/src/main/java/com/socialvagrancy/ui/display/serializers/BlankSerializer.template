@@ -1,0 +1,26 @@
+//===================================================================
+//===================================================================
+
+package com.socialvagrancy.blackpearl.logs.ui.display.serializers;
+
+import com.socialvagrancy.utils.ui.structures.OutputFormat;
+import java.util.ArrayList;
+
+public class Serialize
+{
+	public static ArrayList<OutputFormat> toOutputFormat(ArrayList<> )
+	{
+		ArrayList<OutputFormat> output = new ArrayList<OutputFormat>();
+		OutputFormat formatted_line;
+
+		for(int i=0; i< .size(); i++)
+		{
+			formatted_line = new OutputFormat();
+			formatted_line.key =;
+			formatted_line.value = ;
+			output.add(formatted_line);
+		}
+
+		return output;
+	}
+}
