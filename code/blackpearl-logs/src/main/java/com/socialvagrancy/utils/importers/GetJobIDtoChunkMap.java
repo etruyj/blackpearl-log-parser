@@ -23,6 +23,8 @@ public class GetJobIDtoChunkMap
 
 	public static HashMap<String, ArrayList<String>> fromDataplanner(String dir_path, int log_count, Logger log, boolean debugging)
 	{
+		ArrayList<String> exception_list = new ArrayList<String>();
+
 		System.err.print("Importing chunk info...\t\t");
 
 		JobIDtoChunkParser parser = new JobIDtoChunkParser();
@@ -32,27 +34,41 @@ public class GetJobIDtoChunkMap
 		
 		for(int i=log_count; i>=0; i--)
 		{
-			if(i>0)
+			try
 			{
-				file_name = log_name + "." + i;
-			}
-			else
-			{
-				file_name = log_name;
-			}
+				if(i>0)
+				{
+					file_name = log_name + "." + i;
+				}
+				else
+				{
+					file_name = log_name;
+				}
 
-			if(debugging)
-			{
-				System.err.print("\n"); // Close header line: importing...
-				System.err.println(dir_path + file_name);
-			}
+				if(debugging)
+				{
+					System.err.print("\n"); // Close header line: importing...
+					System.err.println(dir_path + file_name);
+				}
 
-			LogReader.readLog(dir_path + file_name, parser, null);
+				LogReader.readLog(dir_path + file_name, parser, null);
+			}
+			catch(Exception e)
+			{
+				// For cleaner output, collect exceptions and output them
+				// after the complete is printed.
+				exception_list.add(e.getMessage());
+			}
 		}
 
 		id_map = parser.getIDMap();
 	
 		System.err.println("[COMPLETE]");
+
+		for(int i=0; i<exception_list.size(); i++)
+		{
+			System.err.println(exception_list.get(i));
+		}
 
 		return id_map;
 		

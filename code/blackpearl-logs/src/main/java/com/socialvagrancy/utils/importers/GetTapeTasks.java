@@ -23,6 +23,8 @@ public class GetTapeTasks
 
 	public static ArrayList<Task> fromDataplanner(String log_dir, int log_count, Logger log, boolean debugging)
 	{
+		ArrayList<String> exception_list = new ArrayList<String>();
+
 		System.err.print("Importing tape tasks...\t\t");
 
 		String log_name = "logs/var.log.dataplanner-main.log";
@@ -31,28 +33,42 @@ public class GetTapeTasks
 
 		for(int i = log_count; i>=0; i--)
 		{
-			if(i > 0)
-			{
-				file_name = log_name + "." + i;
-			}
-			else
-			{
-				file_name = log_name;
-			}
+			try
+			{	
+				if(i > 0)
+				{
+					file_name = log_name + "." + i;
+				}
+				else
+				{
+					file_name = log_name;
+				}
 		
-			if(debugging)
-			{
-				System.err.print("\n"); // close out header line.
-				System.err.println(log_dir + file_name);
+				if(debugging)
+				{
+					System.err.print("\n"); // close out header line.
+					System.err.println(log_dir + file_name);
+				}
+
+				LogReader.readLog(log_dir + file_name, task_parser, log);
+	
 			}
-
-			LogReader.readLog(log_dir + file_name, task_parser, log);
-
+			catch(Exception e)
+			{
+				// For cleaner output, collect exceptions and print them
+				// after [COMPLETE]
+				exception_list.add(e.getMessage());
+			}
 		}
 
 		ArrayList<Task> task_list = task_parser.getTaskList();
 
 		System.err.println("[COMPLETE]");
+
+		for(int i=0; i<exception_list.size(); i++)
+		{
+			System.err.println(exception_list.get(i));
+		}
 
 		return task_list;
 	}

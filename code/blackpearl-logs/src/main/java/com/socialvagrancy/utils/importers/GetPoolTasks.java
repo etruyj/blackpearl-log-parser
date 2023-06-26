@@ -24,6 +24,8 @@ public class GetPoolTasks
 
 	public static ArrayList<Task> fromDataplanner(String dir_path, int log_count, Logger log, boolean debugging)
 	{
+		ArrayList<String> exception_list = new ArrayList<String>();
+
 		System.err.print("Importing pool tasks...\t\t");
 
 		String log_name = "logs/var.log.dataplanner-main.log";
@@ -32,27 +34,41 @@ public class GetPoolTasks
 
 		for(int i=log_count; i>=0; i--)
 		{
-			if(i > 0)
+			try
 			{
-				file_name = dir_path + "/" + log_name + "." + i;
-			}
-			else
-			{
-				file_name = dir_path + "/" + log_name;
-			}
+				if(i > 0)
+				{
+					file_name = dir_path + "/" + log_name + "." + i;
+				}
+				else
+				{
+					file_name = dir_path + "/" + log_name;
+				}
 
-			if(debugging)
-			{
-				System.err.print("\n"); // close off header
-				System.err.println(file_name);
-			}
+				if(debugging)
+				{
+					System.err.print("\n"); // close off header
+					System.err.println(file_name);
+				}
 
-			LogReader.readLog(file_name, pool_parser, log);
+				LogReader.readLog(file_name, pool_parser, log);
+			}
+			catch(Exception e)
+			{
+				// For cleaner output, collect exceptions to print them after
+				// the complete is printed.
+				exception_list.add(e.getMessage());
+			}
 		}
 
 		ArrayList<Task> task_list = pool_parser.getTaskList();
 
 		System.err.println("[COMPLETE]");
+
+		for(int i=0; i<exception_list.size(); i++)
+		{
+			System.err.println(exception_list.get(i));
+		}
 
 		return task_list;
 	}

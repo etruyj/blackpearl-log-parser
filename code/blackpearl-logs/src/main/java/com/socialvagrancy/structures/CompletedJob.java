@@ -19,7 +19,9 @@ public class CompletedJob
 
 	public String bucketID(int job) { return data[job].bucket_id; }
 	public String cachedSize(int job) { return data[job].cached_size_in_bytes; }
+	public String createdAt(int job) { return data[job].created_at; }
 	public String completedSize(int job) { return data[job].completed_size_in_bytes; }
+	public String id(int job) { return data[job].id; }
 	public String originalSize(int job) { return data[job].original_size_in_bytes; }
 	public String name(int job) { return data[job].name; }
 	public String type(int job) { return data[job].request_type; }

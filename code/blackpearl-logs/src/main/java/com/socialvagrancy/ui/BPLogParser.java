@@ -21,6 +21,9 @@ public class BPLogParser
 			case "job-details":
 				to_print = Controller.completedJobDetails(path);
 				break;
+			case "debug-missing-jobs":
+				to_print = Controller.debugMissingJobs(path);
+				break;
 			case "fetch-config":
 				to_print = Controller.fetchConfiguration(path);
 				output_format = "json";

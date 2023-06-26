@@ -51,6 +51,14 @@ public class JobDetails
 	public String name() { return job_info.name; }
 	public String type() { return job_info.request_type; }
 
+	// Total copies
+	public int ds3CopyCount() { return ds3_copies.size(); }
+	public int poolCopyCount() { return pool_copies.size(); }
+	public int tapeCopyCount() { return tape_copies.size();	}
+
+
+
+	// Copies by Chunk
 	public int tapeCopyCount(String chunk) 
 	{
 	       	if(tape_copies.get(chunk) == null)

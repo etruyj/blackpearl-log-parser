@@ -144,9 +144,14 @@ public class GenerateTapeOperations
 				ops_list.get(i).drive_number = String.valueOf(drive);
 			}	
 
-			ops_list.get(i).barcode = exchange.tape_barcode;
-			ops_list.get(i).partition_id = exchange.partition_id;
-			ops_list.get(i).partition_name = sn_partition_map.get(ops_list.get(i).partition_id).name;
+            try {
+			    ops_list.get(i).barcode = exchange.tape_barcode;
+			    ops_list.get(i).partition_id = exchange.partition_id;
+			    ops_list.get(i).partition_name = sn_partition_map.get(ops_list.get(i).partition_id).name;
+            }
+            catch(Exception e) {
+                System.err.println(e.getMessage());
+            }
 
 			if(mount_time.isAfter(start_time))
 			{

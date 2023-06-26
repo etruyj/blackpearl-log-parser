@@ -24,6 +24,8 @@ public class GetDS3Tasks
 
 	public static ArrayList<Task> fromDataplanner(String dir_path, int log_count, Logger log, boolean debugging)
 	{
+		ArrayList<String> exception_list = new ArrayList<String>();
+
 		if(!debugging)
 		{
 			System.err.print("Importing pool tasks...\t\t");
@@ -39,21 +41,30 @@ public class GetDS3Tasks
 
 		for(int i=log_count; i>=0; i--)
 		{
-			if(i > 0)
+			try
 			{
-				file_name = dir_path + "/" + log_name + "." + i;
-			}
-			else
-			{
-				file_name = dir_path + "/" + log_name;
-			}
+				if(i > 0)
+				{
+					file_name = dir_path + "/" + log_name + "." + i;
+				}
+				else
+				{
+					file_name = dir_path + "/" + log_name;
+				}
 
-			if(debugging)
-			{
-				System.err.println(file_name);
-			}
+				if(debugging)
+				{
+					System.err.println(file_name);
+				}
 
-			LogReader.readLog(file_name, ds3_parser, log);
+				LogReader.readLog(file_name, ds3_parser, log);
+			}
+			catch(Exception e)
+			{
+				// For cleaner output, collect exceptions and print them after
+				// the completed.
+				exception_list.add(e.getMessage());
+			}
 		}
 
 		ArrayList<Task> task_list = ds3_parser.getTaskList();
@@ -61,6 +72,11 @@ public class GetDS3Tasks
 		if(!debugging)
 		{
 			System.err.println("[COMPLETE]");
+		}
+
+		for(int i=0; i<exception_list.size(); i++)
+		{
+			System.err.println(exception_list.get(i));
 		}
 
 		return task_list;

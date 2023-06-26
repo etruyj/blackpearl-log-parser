@@ -12,6 +12,7 @@ import com.socialvagrancy.blackpearl.logs.structures.outputs.ActiveJob;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.Bucket;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.DataPolicy;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.JobDetails;
+import com.socialvagrancy.blackpearl.logs.structures.outputs.JobSummary;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.StorageDomain;
 import com.socialvagrancy.blackpearl.logs.structures.outputs.SystemInfo;
 import com.socialvagrancy.utils.ui.structures.OutputFormat;
@@ -39,6 +40,10 @@ public class Serializer
 			else if(to_print.get(0) instanceof JobDetails)
 			{
 				return SerializeJobDetails.toOutputFormat(to_print);
+			}
+			else if(to_print.get(0) instanceof JobSummary)
+			{
+				return SerializeJobSummary.toOutputFormat(to_print);
 			}
 			else if(to_print.get(0) instanceof StorageDomain)
 			{

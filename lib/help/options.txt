@@ -6,6 +6,7 @@ BlackPearl Log Parser
 
 Options:
 	--help/-h	Displays this help file.
+    --path      Specify the path to the BlackPearl log directory. The unzipped log file name must be included in the path.
 	--version	Displays the version of this script
 
 Commands:

@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class LogReader
 {
-	public static ParserInterface readLog(String path, ParserInterface parser, Logger log)
+	public static ParserInterface readLog(String path, ParserInterface parser, Logger log) throws Exception
 	{
 		File file = new File(path);
 
@@ -41,7 +41,7 @@ public class LogReader
 		}
 		else
 		{
-			System.err.println("File [" + path + "] does not exist.");
+			throw new Exception("File [" + path + "] does not exist.");
 		}
 
 		return parser;
